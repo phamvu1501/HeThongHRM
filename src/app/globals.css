@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+
+:root {
+  --primary: #bde619;
+  --primary-dark: #a5cc00;
+  --bg-light: #f8f8f6;
+  --bg-dark: #1e2111;
+  --sidebar-w: 240px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg-light);
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dark body {
+  background: var(--bg-dark);
+  color: #f1f5f9;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Sidebar fade in animation */
+@keyframes slideInLeft {
+  from { transform: translateX(-16px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-in {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.animate-fade-up {
+  animation: fadeInUp 0.25s ease-out;
+}
+
+/* Stagger children */
+.stagger > * {
+  animation: fadeInUp 0.25s ease-out both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger > *:nth-child(6) { animation-delay: 0.3s; }
+
+/* Primary badge glow */
+.badge-primary {
+  background: var(--primary);
+  color: #1e2111;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Table row hover */
+.table-row-hover:hover {
+  background: #f8fafc;
+}
+
+/* Custom focus ring */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
