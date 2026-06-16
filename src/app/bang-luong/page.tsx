@@ -4,6 +4,7 @@ import { fetchData, savePayrolls, logActivity } from '@/lib/store'
 import { formatCurrency, getPayrollStatusColor, getMonthDisplay } from '@/lib/utils'
 import { TopBar } from '@/components/TopBar'
 import { exportPayrolls } from '@/lib/excel'
+import { getAuth, AuthUser } from '@/lib/auth'
 import type { Payroll, PayrollStatus } from '@/lib/types'
 
 export default function BangLuongPage() {
@@ -15,12 +16,20 @@ export default function BangLuongPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selected, setSelected] = useState<Payroll | null>(null)
+  const [auth, setAuth] = useState<AuthUser | null>(null)
 
   useEffect(() => {
     setLoading(true)
+    const authData = getAuth()
+    setAuth(authData)
+
     fetchData().then(data => {
-      setPayrolls(data.payrolls)
-      const months = [...new Set(data.payrolls.map(p => p.month))].sort().reverse()
+      let filteredPayrolls = data.payrolls
+      if (authData?.role === 'EMPLOYEE' && authData.empId) {
+        filteredPayrolls = data.payrolls.filter(p => p.employee_id === authData.empId)
+      }
+      setPayrolls(filteredPayrolls)
+      const months = [...new Set(filteredPayrolls.map(p => p.month))].sort().reverse()
       setMonthFilter(months[0] ?? '')
       setLoading(false)
     }).catch(err => { setError(err.message); setLoading(false) })
@@ -100,7 +109,7 @@ export default function BangLuongPage() {
             {saving && <span className="text-xs text-slate-400 flex items-center gap-1">
               <span className="material-symbols-outlined text-[14px] animate-spin">sync</span>Đang lưu…
             </span>}
-            {filtered.some(p => p.status !== 'Đã thanh toán') && (
+            {auth?.role === 'ADMIN' && filtered.some(p => p.status !== 'Đã thanh toán') && (
               <button onClick={handleMarkAllPaid}
                 className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl border border-emerald-300 text-emerald-700 hover:bg-emerald-50 transition-colors">
                 <span className="material-symbols-outlined text-[16px]">payments</span>
@@ -170,7 +179,7 @@ export default function BangLuongPage() {
                 <th className="text-right px-3 py-3">BH/Thuế</th>
                 <th className="text-right px-5 py-3 font-black text-slate-800">Net</th>
                 <th className="text-left px-3 py-3">Trạng thái</th>
-                <th className="px-3 py-3"></th>
+                {auth?.role === 'ADMIN' && <th className="px-3 py-3"></th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -199,15 +208,17 @@ export default function BangLuongPage() {
                       {p.status}
                     </span>
                   </td>
-                  <td className="px-3 py-3">
-                    {p.status !== 'Đã thanh toán' && (
-                      <button
-                        onClick={e => { e.stopPropagation(); handleMarkPaid(p) }}
-                        className="opacity-0 group-hover:opacity-100 text-[10px] font-bold px-2 py-1 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-all">
-                        Duyệt
-                      </button>
-                    )}
-                  </td>
+                  {auth?.role === 'ADMIN' && (
+                    <td className="px-3 py-3">
+                      {p.status !== 'Đã thanh toán' && (
+                        <button
+                          onClick={e => { e.stopPropagation(); handleMarkPaid(p) }}
+                          className="opacity-0 group-hover:opacity-100 text-[10px] font-bold px-2 py-1 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-all">
+                          Duyệt
+                        </button>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -283,7 +294,7 @@ export default function BangLuongPage() {
                 </div>
               </div>
 
-              {selected.status !== 'Đã thanh toán' && (
+              {auth?.role === 'ADMIN' && selected.status !== 'Đã thanh toán' && (
                 <button onClick={() => handleMarkPaid(selected)} disabled={saving}
                   className="w-full mt-4 text-sm font-bold py-2.5 rounded-xl text-slate-900 hover:opacity-90 transition-all disabled:opacity-50"
                   style={{ background: '#bde619' }}>

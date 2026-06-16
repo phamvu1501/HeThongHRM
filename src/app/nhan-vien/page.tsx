@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { fetchData, saveEmployees, logActivity } from '@/lib/store'
 import { exportEmployees } from '@/lib/excel'
 import { formatDate, formatCurrency, getInitials, getAvatarColor, getStatusColor, getContractTypeColor } from '@/lib/utils'
+import { getAuth, AuthUser } from '@/lib/auth'
 import { TopBar } from '@/components/TopBar'
 import { Modal } from '@/components/Modal'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
@@ -41,6 +42,7 @@ export default function NhanVienPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [auth, setAuth] = useState<AuthUser | null>(null)
 
   const [search, setSearch] = useState('')
   const [deptFilter, setDeptFilter] = useState('all')
@@ -53,8 +55,15 @@ export default function NhanVienPage() {
 
   useEffect(() => {
     setLoading(true)
+    const authData = getAuth()
+    setAuth(authData)
+    
     fetchData().then(data => {
-      setEmployees(data.employees)
+      let filteredEmployees = data.employees
+      if (authData?.role === 'EMPLOYEE' && authData.empId) {
+        filteredEmployees = data.employees.filter(e => e.employee_id === authData.empId)
+      }
+      setEmployees(filteredEmployees)
       setDepartments(data.departments)
       setPositions(data.positions)
       setForm(emptyEmp(data.departments, data.positions))
@@ -177,11 +186,13 @@ export default function NhanVienPage() {
             {saving && <span className="text-xs text-slate-400 flex items-center gap-1">
               <span className="material-symbols-outlined text-[14px] animate-spin">sync</span>Đang lưu…
             </span>}
-            <button onClick={openAdd}
-              className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl text-slate-900 hover:opacity-90 transition-all"
-              style={{ background: '#bde619' }}>
-              <span className="material-symbols-outlined text-[16px]">person_add</span>Thêm mới
-            </button>
+            {auth?.role === 'ADMIN' && (
+              <button onClick={openAdd}
+                className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl text-slate-900 hover:opacity-90 transition-all"
+                style={{ background: '#bde619' }}>
+                <span className="material-symbols-outlined text-[16px]">person_add</span>Thêm mới
+              </button>
+            )}
           </div>
         }
       />
@@ -220,7 +231,7 @@ export default function NhanVienPage() {
                   <th className="text-left px-3 py-3">Hợp đồng</th>
                   <th className="text-right px-3 py-3">Lương CB</th>
                   <th className="text-left px-3 py-3">Trạng thái</th>
-                  <th className="px-3 py-3 text-right">Thao tác</th>
+                  {auth?.role === 'ADMIN' && <th className="px-3 py-3 text-right">Thao tác</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -249,16 +260,18 @@ export default function NhanVienPage() {
                         {emp.status === 'Active' ? '● Đang làm việc' : '○ Đã nghỉ'}
                       </span>
                     </td>
-                    <td className="px-3 py-3 text-right">
-                      <div className="inline-flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={e => { e.stopPropagation(); openEdit(emp) }} className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-400 hover:text-blue-600 transition-colors" title="Chỉnh sửa">
-                          <span className="material-symbols-outlined text-[16px]">edit</span>
-                        </button>
-                        <button onClick={e => { e.stopPropagation(); setDeleteTarget(emp) }} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Xóa">
-                          <span className="material-symbols-outlined text-[16px]">delete</span>
-                        </button>
-                      </div>
-                    </td>
+                    {auth?.role === 'ADMIN' && (
+                      <td className="px-3 py-3 text-right">
+                        <div className="inline-flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={e => { e.stopPropagation(); openEdit(emp) }} className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-400 hover:text-blue-600 transition-colors" title="Chỉnh sửa">
+                            <span className="material-symbols-outlined text-[16px]">edit</span>
+                          </button>
+                          <button onClick={e => { e.stopPropagation(); setDeleteTarget(emp) }} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Xóa">
+                            <span className="material-symbols-outlined text-[16px]">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -323,16 +336,18 @@ export default function NhanVienPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-5 flex gap-2">
-                <button onClick={() => openEdit(selected)}
-                  className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold py-2 rounded-xl border border-slate-200 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-colors">
-                  <span className="material-symbols-outlined text-[14px]">edit</span>Chỉnh sửa
-                </button>
-                <button onClick={() => setDeleteTarget(selected)}
-                  className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
-                  <span className="material-symbols-outlined text-[14px]">delete</span>Xóa
-                </button>
-              </div>
+              {auth?.role === 'ADMIN' && (
+                <div className="mt-5 flex gap-2">
+                  <button onClick={() => openEdit(selected)}
+                    className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold py-2 rounded-xl border border-slate-200 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-colors">
+                    <span className="material-symbols-outlined text-[14px]">edit</span>Chỉnh sửa
+                  </button>
+                  <button onClick={() => setDeleteTarget(selected)}
+                    className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
+                    <span className="material-symbols-outlined text-[14px]">delete</span>Xóa
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

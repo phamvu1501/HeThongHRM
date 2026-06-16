@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { fetchData, saveLeaveRequests, logActivity } from '@/lib/store'
 import { exportLeaveRequests } from '@/lib/excel'
 import { formatDate, getLeaveStatusColor } from '@/lib/utils'
+import { getAuth, AuthUser } from '@/lib/auth'
 import { TopBar } from '@/components/TopBar'
 import { Modal } from '@/components/Modal'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
@@ -241,6 +242,7 @@ export default function DonTuPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [auth, setAuth] = useState<AuthUser | null>(null)
 
   // View mode: 'list' | 'calendar'
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list')
@@ -261,12 +263,22 @@ export default function DonTuPage() {
 
   useEffect(() => {
     setLoading(true)
+    const authData = getAuth()
+    setAuth(authData)
+
     fetchData().then(data => {
-      const activeEmps = data.employees.filter(e => e.status === 'Active')
+      let activeEmps = data.employees.filter(e => e.status === 'Active')
+      let leaveData = data.leaveRequests
+
+      if (authData?.role === 'EMPLOYEE' && authData.empId) {
+        activeEmps = activeEmps.filter(e => e.employee_id === authData.empId)
+        leaveData = leaveData.filter(l => l.employee_id === authData.empId)
+      }
+
       const map = Object.fromEntries(data.employees.map(e => [e.employee_id, e.full_name]))
       setEmployees(activeEmps)
       setEmpMap(map)
-      setRecords(data.leaveRequests.map(l => ({
+      setRecords(leaveData.map(l => ({
         ...l,
         employee_name: map[l.employee_id] ?? l.employee_name ?? '',
         approver_name: l.approved_by ? map[l.approved_by] ?? '' : '',
@@ -462,11 +474,13 @@ export default function DonTuPage() {
           <option value="Đã duyệt">Đã duyệt</option>
           <option value="Từ chối">Từ chối</option>
         </select>
-        <select value={empFilter} onChange={e => setEmpFilter(e.target.value)}
-          className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer">
-          <option value="all">Tất cả nhân viên</option>
-          {employees.map(e => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
-        </select>
+        {auth?.role === 'ADMIN' && (
+          <select value={empFilter} onChange={e => setEmpFilter(e.target.value)}
+            className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer">
+            <option value="all">Tất cả nhân viên</option>
+            {employees.map(e => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
+          </select>
+        )}
         <span className="text-xs text-slate-500 flex items-center">{filtered.length} đơn</span>
         <button onClick={() => exportLeaveRequests(filtered)}
           className="ml-auto flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-700 transition-colors">
@@ -511,7 +525,7 @@ export default function DonTuPage() {
                         className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all" title="Xóa">
                         <span className="material-symbols-outlined text-[14px]">delete</span>
                       </button>
-                      {leave.status === 'Chờ duyệt' && (
+                      {auth?.role === 'ADMIN' && leave.status === 'Chờ duyệt' && (
                         <>
                           <button onClick={e => { e.stopPropagation(); handleApprove(leave) }}
                             className="text-[10px] font-bold px-2 py-1 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors">
@@ -569,7 +583,7 @@ export default function DonTuPage() {
                 ))}
 
                 <div className="pt-3 space-y-2">
-                  {selected.status === 'Chờ duyệt' && (
+                  {auth?.role === 'ADMIN' && selected.status === 'Chờ duyệt' && (
                     <div className="flex gap-2">
                       <button onClick={() => handleApprove(selected)}
                         className="flex-1 text-sm font-bold py-2.5 rounded-xl text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors">
@@ -656,7 +670,7 @@ export default function DonTuPage() {
                       {l.reason && (
                         <p className="text-xs text-slate-600 mt-1 italic line-clamp-2">"{l.reason}"</p>
                       )}
-                      {l.status === 'Chờ duyệt' && (
+                      {auth?.role === 'ADMIN' && l.status === 'Chờ duyệt' && (
                         <div className="flex gap-2 mt-2">
                           <button onClick={() => { handleApprove(l); setCalDayModal(null) }}
                             className="text-[10px] font-bold px-2 py-1 rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors">

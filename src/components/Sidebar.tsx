@@ -4,6 +4,8 @@ import { usePathname } from 'next/navigation'
 import { getInitials, getAvatarColor } from '@/lib/utils'
 import { loadData } from '@/lib/store'
 import { exportAllData } from '@/lib/excel'
+import { useEffect, useState } from 'react'
+import { getAuth, AuthUser } from '@/lib/auth'
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: 'dashboard', label: 'Tổng quan' },
@@ -17,13 +19,31 @@ const NAV_ITEMS = [
   { href: '/cai-dat', icon: 'settings', label: 'Cài đặt' },
 ]
 
-const currentUser = { name: 'Admin Quản trị', role: 'Quản trị hệ thống' }
-
 export function Sidebar() {
   const pathname = usePathname()
+  const [auth, setAuth] = useState<AuthUser | null>(null)
+  const [currentUser, setCurrentUser] = useState({ name: 'Đang tải...', role: '...' })
+
+  useEffect(() => {
+    const authData = getAuth()
+    setAuth(authData)
+    if (authData?.role === 'ADMIN') {
+      setCurrentUser({ name: 'Admin Quản trị', role: 'Quản trị hệ thống' })
+    } else if (authData?.role === 'EMPLOYEE' && authData.empId) {
+       const data = loadData() // From cache
+       const emp = data.employees.find(e => e.employee_id === authData.empId)
+       if (emp) {
+         setCurrentUser({ name: emp.full_name, role: emp.position_name || 'Nhân viên' })
+       } else {
+         setCurrentUser({ name: authData.empId, role: 'Nhân viên' })
+       }
+    }
+  }, [pathname]) // re-run if needed, but mostly runs on mount
 
   function handleLogout() {
     document.cookie = 'auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = 'role=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = 'empId=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     window.location.href = '/login';
   }
 
@@ -61,7 +81,12 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
-        {NAV_ITEMS.map((item) => {
+        {NAV_ITEMS.filter(item => {
+          if (auth?.role === 'EMPLOYEE') {
+            return ['/dashboard', '/nhan-vien', '/cham-cong', '/don-tu', '/bang-luong'].includes(item.href)
+          }
+          return true
+        }).map((item) => {
           const isActive = pathname === item.href
           return (
             <Link
@@ -90,16 +115,18 @@ export function Sidebar() {
       </nav>
 
       {/* Quick Export to Excel */}
-      <div className="px-3 pb-3">
-        <button
-          onClick={handleExportAll}
-          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 transition-all group border border-dashed border-slate-200 hover:border-[#bde619] hover:bg-[#bde619]/5"
-          title="Xuất toàn bộ dữ liệu ra 1 file Excel (5 sheet)"
-        >
-          <span className="material-symbols-outlined text-[18px] text-slate-400 group-hover:text-[#7c9500]">table_chart</span>
-          Xuất toàn bộ Excel
-        </button>
-      </div>
+      {auth?.role === 'ADMIN' && (
+        <div className="px-3 pb-3">
+          <button
+            onClick={handleExportAll}
+            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 transition-all group border border-dashed border-slate-200 hover:border-[#bde619] hover:bg-[#bde619]/5"
+            title="Xuất toàn bộ dữ liệu ra 1 file Excel (5 sheet)"
+          >
+            <span className="material-symbols-outlined text-[18px] text-slate-400 group-hover:text-[#7c9500]">table_chart</span>
+            Xuất toàn bộ Excel
+          </button>
+        </div>
+      )}
 
       {/* User profile */}
       <div className="px-4 py-4 border-t border-slate-100">

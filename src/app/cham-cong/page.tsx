@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { fetchData, saveAttendances, logActivity } from '@/lib/store'
 import { exportAttendances } from '@/lib/excel'
 import { formatDate, getAttendanceStatusColor } from '@/lib/utils'
+import { getAuth, AuthUser } from '@/lib/auth'
 import { TopBar } from '@/components/TopBar'
 import { Modal } from '@/components/Modal'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
@@ -43,6 +44,7 @@ export default function ChamCongPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [auth, setAuth] = useState<AuthUser | null>(null)
 
   const [empFilter, setEmpFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -56,9 +58,20 @@ export default function ChamCongPage() {
   // ── Load data from Excel ──
   useEffect(() => {
     setLoading(true)
+    const authData = getAuth()
+    setAuth(authData)
+
     fetchData().then(data => {
-      setRecords(data.attendances)
-      setEmployees(data.employees.filter(e => e.status === 'Active'))
+      let filteredAttendances = data.attendances
+      let activeEmps = data.employees.filter(e => e.status === 'Active')
+
+      if (authData?.role === 'EMPLOYEE' && authData.empId) {
+        filteredAttendances = data.attendances.filter(a => a.employee_id === authData.empId)
+        activeEmps = activeEmps.filter(e => e.employee_id === authData.empId)
+      }
+
+      setRecords(filteredAttendances)
+      setEmployees(activeEmps)
       setShifts(data.shifts.filter(s => s.status === 'Active'))
       // Set month filter to latest month in data
       const months = [...new Set(data.attendances.map(a => a.work_date.slice(0, 7)))].sort()
@@ -187,8 +200,8 @@ export default function ChamCongPage() {
             className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl text-slate-900 hover:opacity-90 transition-all"
             style={{ background: '#bde619' }}
           >
-            <span className="material-symbols-outlined text-[16px]">add</span>
-            Thêm bản ghi
+            <span className="material-symbols-outlined text-[16px]">{auth?.role === 'ADMIN' ? 'add' : 'how_to_reg'}</span>
+            {auth?.role === 'ADMIN' ? 'Thêm bản ghi' : 'Báo cáo chấm công'}
           </button>
         }
       />
@@ -218,11 +231,13 @@ export default function ChamCongPage() {
           className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer">
           {months.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
-        <select value={empFilter} onChange={e => setEmpFilter(e.target.value)}
-          className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer">
-          <option value="all">Tất cả nhân viên</option>
-          {employees.map(e => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
-        </select>
+        {auth?.role === 'ADMIN' && (
+          <select value={empFilter} onChange={e => setEmpFilter(e.target.value)}
+            className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer">
+            <option value="all">Tất cả nhân viên</option>
+            {employees.map(e => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
+          </select>
+        )}
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
           className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer">
           <option value="all">Tất cả trạng thái</option>
@@ -275,9 +290,11 @@ export default function ChamCongPage() {
                     <button onClick={() => openEdit(att)} className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-400 hover:text-blue-600 transition-colors" title="Chỉnh sửa">
                       <span className="material-symbols-outlined text-[16px]">edit</span>
                     </button>
-                    <button onClick={() => setDeleteTarget(att)} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Xóa">
-                      <span className="material-symbols-outlined text-[16px]">delete</span>
-                    </button>
+                    {auth?.role === 'ADMIN' && (
+                      <button onClick={() => setDeleteTarget(att)} className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Xóa">
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -317,7 +334,8 @@ export default function ChamCongPage() {
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">Ngày làm việc *</label>
             <input type="date" value={f.work_date} onChange={e => setForm(p => ({ ...p, work_date: e.target.value }))}
-              className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50" />
+              disabled={auth?.role === 'EMPLOYEE'}
+              className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 disabled:opacity-60 disabled:cursor-not-allowed" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">Ca làm việc *</label>

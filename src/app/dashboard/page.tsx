@@ -5,6 +5,7 @@ import { fetchData } from '@/lib/store'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 import { TopBar } from '@/components/TopBar'
 import { AttendanceBot } from '@/components/AttendanceBot'
+import { getAuth, AuthUser } from '@/lib/auth'
 import type { AppData } from '@/lib/types'
 
 // Lấy cảm hứng từ mẫu Dashboard Quản Trị HRM Tổng Lực & Dashboard Quản Trị Hệ Thống v1
@@ -13,8 +14,10 @@ const DEPT_COLORS = ['#bde619', '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6', '#ec
 export default function DashboardPage() {
    const [data, setData] = useState<AppData | null>(null)
    const [loading, setLoading] = useState(true)
+   const [auth, setAuth] = useState<AuthUser | null>(null)
 
    useEffect(() => {
+      setAuth(getAuth())
       fetchData().then(res => {
          setData(res)
          setLoading(false)
@@ -58,6 +61,17 @@ export default function DashboardPage() {
       const onTimeToday = attToday.filter(a => a.status === 'Đúng giờ' || a.status === 'Tăng ca').length
       const onTimeRate = presentToday > 0 ? ((onTimeToday / presentToday) * 100).toFixed(1) : (attToday.length > 0 ? '0.0' : '100')
       const abnormalAttendances = attToday.filter(a => ['Đi trễ', 'Về sớm', 'Vắng mặt'].includes(a.status))
+
+      // Tính duplicates: những ai chấm công > 1 lần hôm nay
+      const empCount = new Map<string, number>()
+      const duplicates: import('@/lib/types').Attendance[] = []
+      attToday.forEach(a => {
+         const count = empCount.get(a.employee_id) || 0
+         if (count === 1) {
+            duplicates.push(a)
+         }
+         empCount.set(a.employee_id, count + 1)
+      })
 
       // 3. Đơn chờ duyệt
       const pendingLeaves = leaveRequests.filter(l => l.status === 'Chờ duyệt')
@@ -134,7 +148,8 @@ export default function DashboardPage() {
          maxVal,
          currentMonthNum,
          upcomingLeaves,
-         abnormalAttendances
+         abnormalAttendances,
+         duplicates
       }
    }, [data])
 
@@ -157,7 +172,7 @@ export default function DashboardPage() {
       totalEmp, onTimeRate, pendingLeaves, totalPayroll,
       deptStats, totalDeptEmp, birthdays, recentLogs,
       payrollTrend, maxVal, currentMonthNum, upcomingLeaves,
-      abnormalAttendances
+      abnormalAttendances, duplicates
    } = stats
 
    const LOG_ICON: Record<string, string> = {
@@ -228,26 +243,33 @@ export default function DashboardPage() {
                   </div>
                </Link>
 
-               <Link href="/bang-luong" className="bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-800 text-white hover:scale-[1.02] transform transition-transform block cursor-pointer">
-                  <div className="flex items-start justify-between mb-4">
-                     {/* Styling icon with primary color */}
-                     <div className="size-12 rounded-xl bg-[#bde619] text-slate-900 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-[28px]">account_balance_wallet</span>
+               {auth?.role === 'EMPLOYEE' ? (
+                  <div className="bg-slate-50 p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
+                     <span className="material-symbols-outlined text-4xl text-slate-200 mb-2">lock</span>
+                     <p className="text-xs font-semibold text-slate-400">Bảo mật</p>
+                  </div>
+               ) : (
+                  <Link href="/bang-luong" className="bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-800 text-white hover:scale-[1.02] transform transition-transform block cursor-pointer">
+                     <div className="flex items-start justify-between mb-4">
+                        {/* Styling icon with primary color */}
+                        <div className="size-12 rounded-xl bg-[#bde619] text-slate-900 flex items-center justify-center">
+                           <span className="material-symbols-outlined text-[28px]">account_balance_wallet</span>
+                        </div>
+                        <span className="text-[11px] font-bold text-[#bde619] bg-[#bde619]/20 px-2.5 py-1 rounded-full uppercase tracking-wider">Tháng này</span>
                      </div>
-                     <span className="text-[11px] font-bold text-[#bde619] bg-[#bde619]/20 px-2.5 py-1 rounded-full uppercase tracking-wider">Tháng này</span>
-                  </div>
-                  <p className="text-[13px] font-semibold text-slate-400 uppercase tracking-widest">Lương tạm tính</p>
-                  <div className="flex items-baseline gap-1.5 mt-1">
-                     {totalPayroll > 0 ? (
-                        <>
-                           <h3 className="text-3xl lg:text-4xl font-black text-white tracking-tight">{(totalPayroll / 1000000).toFixed(1)}</h3>
-                           <span className="text-sm font-bold text-[#bde619]">Tr VNĐ</span>
-                        </>
-                     ) : (
-                        <h3 className="text-2xl font-black text-slate-400 tracking-tight">Chưa tính toán</h3>
-                     )}
-                  </div>
-               </Link>
+                     <p className="text-[13px] font-semibold text-slate-400 uppercase tracking-widest">Lương tạm tính</p>
+                     <div className="flex items-baseline gap-1.5 mt-1">
+                        {totalPayroll > 0 ? (
+                           <>
+                              <h3 className="text-3xl lg:text-4xl font-black text-white tracking-tight">{(totalPayroll / 1000000).toFixed(1)}</h3>
+                              <span className="text-sm font-bold text-[#bde619]">Tr VNĐ</span>
+                           </>
+                        ) : (
+                           <h3 className="text-2xl font-black text-slate-400 tracking-tight">Chưa tính toán</h3>
+                        )}
+                     </div>
+                  </Link>
+               )}
             </div>
 
             {/* === CHARTS === */}
@@ -307,56 +329,63 @@ export default function DashboardPage() {
                </div>
 
                {/* Line Chart - Payroll Trend */}
-               <div className="col-span-1 lg:col-span-8 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[340px]">
-                  <div className="flex justify-between items-start mb-6">
-                     <div>
-                        <h4 className="font-bold text-slate-900 text-lg">Biến động quỹ lương Net</h4>
-                        <p className="text-[12px] font-semibold text-slate-400 mt-1 flex items-center gap-1.5">
-                           <span className="w-4 h-1 rounded-full bg-primary"></span> Thực tế 6 tháng qua
-                        </p>
-                     </div>
-                     <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600">
-                        {payrollTrend[0]?.label} - {payrollTrend[payrollTrend.length - 1]?.label}
-                     </div>
+               {auth?.role === 'EMPLOYEE' ? (
+                  <div className="col-span-1 lg:col-span-8 bg-slate-50 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center h-[340px]">
+                     <span className="material-symbols-outlined text-5xl text-slate-200 mb-3">lock</span>
+                     <p className="text-sm font-bold text-slate-400">Bảo mật</p>
                   </div>
-
-                  <div className="flex-1 w-full flex items-end justify-between gap-2 relative mt-2 pt-6">
-                     {/* Horizontal reference lines */}
-                     <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                        {[4, 3, 2, 1].map(n => (
-                           <div key={n} className="w-full border-t border-dashed border-slate-200 flex items-start h-0">
-                              <span className="text-[9px] font-bold text-slate-300 -mt-2.5 bg-white pr-2">
-                                 {((maxVal * (n / 4)) / 1000000).toFixed(0)}M
-                              </span>
-                           </div>
-                        ))}
-                        <div className="w-full border-t border-slate-200"></div>
+               ) : (
+                  <div className="col-span-1 lg:col-span-8 bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[340px]">
+                     <div className="flex justify-between items-start mb-6">
+                        <div>
+                           <h4 className="font-bold text-slate-900 text-lg">Biến động quỹ lương Net</h4>
+                           <p className="text-[12px] font-semibold text-slate-400 mt-1 flex items-center gap-1.5">
+                              <span className="w-4 h-1 rounded-full bg-primary"></span> Thực tế 6 tháng qua
+                           </p>
+                        </div>
+                        <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600">
+                           {payrollTrend[0]?.label} - {payrollTrend[payrollTrend.length - 1]?.label}
+                        </div>
                      </div>
 
-                     {/* Bars */}
-                     {payrollTrend.map((pt, i) => {
-                        // Ensure a minimum height of 5% so bar is visible even if value is low
-                        const pct = maxVal > 0 ? Math.max((pt.value / maxVal) * 100, 5) : 5
-                        const isLast = i === payrollTrend.length - 1
-                        return (
-                           <div key={pt.label} className="relative z-10 flex flex-col items-center flex-1 h-full justify-end group">
-                              {/* Hover Tooltip */}
-                              <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-slate-800 text-white text-[10px] font-bold py-1 px-2 rounded-lg whitespace-nowrap shadow-lg">
-                                 {formatCurrency(pt.value)}
+                     <div className="flex-1 w-full flex items-end justify-between gap-2 relative mt-2 pt-6">
+                        {/* Horizontal reference lines */}
+                        <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                           {[4, 3, 2, 1].map(n => (
+                              <div key={n} className="w-full border-t border-dashed border-slate-200 flex items-start h-0">
+                                 <span className="text-[9px] font-bold text-slate-300 -mt-2.5 bg-white pr-2">
+                                    {((maxVal * (n / 4)) / 1000000).toFixed(0)}M
+                                 </span>
                               </div>
-                              {/* Bar */}
-                              <div
-                                 className={`w-full max-w-[32px] md:max-w-[48px] rounded-t-lg transition-all duration-500 ease-out group-hover:opacity-80
-                              ${isLast ? 'bg-[#bde619] shadow-[0_0_15px_rgba(189,230,25,0.4)]' : 'bg-slate-200'}
-                           `}
-                                 style={{ height: `${pct}%` }}
-                              ></div>
-                              <span className="text-[10px] font-bold text-slate-500 mt-2">{pt.label}</span>
-                           </div>
-                        )
-                     })}
+                           ))}
+                           <div className="w-full border-t border-slate-200"></div>
+                        </div>
+
+                        {/* Bars */}
+                        {payrollTrend.map((pt, i) => {
+                           // Ensure a minimum height of 5% so bar is visible even if value is low
+                           const pct = maxVal > 0 ? Math.max((pt.value / maxVal) * 100, 5) : 5
+                           const isLast = i === payrollTrend.length - 1
+                           return (
+                              <div key={pt.label} className="relative z-10 flex flex-col items-center flex-1 h-full justify-end group">
+                                 {/* Hover Tooltip */}
+                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-slate-800 text-white text-[10px] font-bold py-1 px-2 rounded-lg whitespace-nowrap shadow-lg">
+                                    {formatCurrency(pt.value)}
+                                 </div>
+                                 {/* Bar */}
+                                 <div
+                                    className={`w-full max-w-[32px] md:max-w-[48px] rounded-t-lg transition-all duration-500 ease-out group-hover:opacity-80
+                                 ${isLast ? 'bg-[#bde619] shadow-[0_0_15px_rgba(189,230,25,0.4)]' : 'bg-slate-200'}
+                              `}
+                                    style={{ height: `${pct}%` }}
+                                 ></div>
+                                 <span className="text-[10px] font-bold text-slate-500 mt-2">{pt.label}</span>
+                              </div>
+                           )
+                        })}
+                     </div>
                   </div>
-               </div>
+               )}
             </div>
 
             {/* === BOTTOM ROW === */}
@@ -409,45 +438,52 @@ export default function DashboardPage() {
                </div>
 
                {/* Recent Activity */}
-               <div className="col-span-1 lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden">
-                  <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-white z-10">
-                     <h4 className="font-bold text-slate-900 text-lg flex items-center gap-2">
-                        Nhật ký H.Động
-                     </h4>
-                     <a href="/nhat-ky" className="text-sm font-bold text-primary hover:underline">Tất cả</a>
+               {auth?.role === 'EMPLOYEE' ? (
+                  <div className="col-span-1 lg:col-span-5 bg-slate-50 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center min-h-[350px]">
+                     <span className="material-symbols-outlined text-5xl text-slate-200 mb-3">lock</span>
+                     <p className="text-sm font-bold text-slate-400">Bảo mật</p>
                   </div>
-                  <div className="flex-1 p-2">
-                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm whitespace-nowrap">
-                           <tbody className="divide-y divide-slate-50">
-                              {recentLogs.map(log => (
-                                 <tr key={log.log_id} className="hover:bg-slate-50/80 transition-colors">
-                                    <td className="px-3 py-3 font-semibold text-slate-800">
-                                       <div className="flex flex-col">
-                                          <span>{log.user}</span>
-                                          <span className="text-[10px] text-slate-400 font-medium">{formatDateTime(log.log_time)}</span>
-                                       </div>
-                                    </td>
-                                    <td className="px-2 py-3">
-                                       <span className={`px-2 py-1 text-[9px] font-bold rounded-md ${LOG_COLOR[log.action] || LOG_DEFAULT}`}>
-                                          {log.action}
-                                       </span>
-                                    </td>
-                                    <td className="px-3 py-3 text-slate-600 truncate max-w-[150px] text-xs" title={log.description}>
-                                       {log.description}
-                                    </td>
-                                 </tr>
-                              ))}
-                              {recentLogs.length === 0 && (
-                                 <tr>
-                                    <td colSpan={3} className="px-4 py-8 text-center text-slate-400 italic">Hệ thống chưa có bản ghi nhật ký nào.</td>
-                                 </tr>
-                              )}
-                           </tbody>
-                        </table>
+               ) : (
+                  <div className="col-span-1 lg:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden">
+                     <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-white z-10">
+                        <h4 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+                           Nhật ký H.Động
+                        </h4>
+                        <a href="/nhat-ky" className="text-sm font-bold text-primary hover:underline">Tất cả</a>
+                     </div>
+                     <div className="flex-1 p-2">
+                        <div className="overflow-x-auto">
+                           <table className="w-full text-left text-sm whitespace-nowrap">
+                              <tbody className="divide-y divide-slate-50">
+                                 {recentLogs.map(log => (
+                                    <tr key={log.log_id} className="hover:bg-slate-50/80 transition-colors">
+                                       <td className="px-3 py-3 font-semibold text-slate-800">
+                                          <div className="flex flex-col">
+                                             <span>{log.user}</span>
+                                             <span className="text-[10px] text-slate-400 font-medium">{formatDateTime(log.log_time)}</span>
+                                          </div>
+                                       </td>
+                                       <td className="px-2 py-3">
+                                          <span className={`px-2 py-1 text-[9px] font-bold rounded-md ${LOG_COLOR[log.action] || LOG_DEFAULT}`}>
+                                             {log.action}
+                                          </span>
+                                       </td>
+                                       <td className="px-3 py-3 text-slate-600 truncate max-w-[150px] text-xs" title={log.description}>
+                                          {log.description}
+                                       </td>
+                                    </tr>
+                                 ))}
+                                 {recentLogs.length === 0 && (
+                                    <tr>
+                                       <td colSpan={3} className="px-4 py-8 text-center text-slate-400 italic">Hệ thống chưa có bản ghi nhật ký nào.</td>
+                                    </tr>
+                                 )}
+                              </tbody>
+                           </table>
+                        </div>
                      </div>
                   </div>
-               </div>
+               )}
 
                {/* Birthdays */}
                <div className="col-span-1 lg:col-span-3 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden">
@@ -486,7 +522,7 @@ export default function DashboardPage() {
             </div>
 
          </div>
-         <AttendanceBot abnormals={abnormalAttendances} />
+         <AttendanceBot abnormals={abnormalAttendances} duplicates={duplicates} />
       </div>
    )
 }

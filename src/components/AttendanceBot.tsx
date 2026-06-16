@@ -4,9 +4,10 @@ import Image from 'next/image';
 
 interface AttendanceBotProps {
   abnormals: Attendance[];
+  duplicates?: Attendance[];
 }
 
-export function AttendanceBot({ abnormals }: AttendanceBotProps) {
+export function AttendanceBot({ abnormals, duplicates = [] }: AttendanceBotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isChatMode, setIsChatMode] = useState(false);
@@ -43,6 +44,10 @@ export function AttendanceBot({ abnormals }: AttendanceBotProps) {
         botResponse = abnormals.length > 0 
           ? `Hôm nay có ${abnormals.length} nhân sự đi trễ/về sớm. Sếp có thể bấm "Quay lại" để xem chi tiết danh sách nhé! 🧐`
           : 'Hôm nay trộm vía không có ai đi muộn hay về sớm sếp ạ! 🎉';
+      } else if (lowerMsg.includes('trùng') || lowerMsg.includes('2 lần')) {
+        botResponse = duplicates.length > 0
+          ? `Cảnh báo sếp ơi, có ${duplicates.length} người chấm công nhiều hơn 1 lần hôm nay. Sếp kiểm tra lại nhé! ⚠️`
+          : 'Hệ thống chấm công hôm nay không ghi nhận trường hợp nào trùng lặp cả sếp ạ! ✅';
       }
 
       setMessages(prev => [...prev, { role: 'bot', text: botResponse }]);
@@ -106,6 +111,26 @@ export function AttendanceBot({ abnormals }: AttendanceBotProps) {
                     </div>
                     <p className="text-sm font-bold text-slate-800">Tuyệt vời!</p>
                     <p className="text-xs text-slate-500 px-4 leading-relaxed">Ngày {todayStr} không có nhân sự nào chấm công trễ hay về sớm. Tất cả đều tuân thủ tốt!</p>
+                  </div>
+                )}
+                
+                {duplicates.length > 0 && (
+                  <div className="mt-6 border-t border-slate-100 pt-4">
+                    <p className="text-[13px] text-slate-600 mb-3 leading-relaxed">
+                      ⚠️ <strong>Cảnh báo:</strong> Có <strong className="text-amber-600">{duplicates.length}</strong> nhân sự chấm công nhiều lần hôm nay:
+                    </p>
+                    <div className="space-y-3">
+                      {duplicates.map((att) => (
+                        <div key={att.attendance_id} className="bg-white p-3 rounded-xl border border-amber-100 shadow-sm flex flex-col gap-1.5 hover:border-amber-300 transition-colors">
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-slate-800 text-sm truncate pr-2">{att.employee_name}</span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 shrink-0">
+                              Trùng lặp
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -172,9 +197,9 @@ export function AttendanceBot({ abnormals }: AttendanceBotProps) {
           </div>
           
           {/* Status Badge */}
-          {abnormals.length > 0 ? (
-            <span className="absolute top-0 right-0 bg-rose-500 text-white border-4 border-white text-xs font-black size-8 rounded-full flex items-center justify-center shadow-lg animate-bounce">
-              {abnormals.length}
+          {abnormals.length > 0 || duplicates.length > 0 ? (
+            <span className={`absolute top-0 right-0 text-white border-4 border-white text-xs font-black size-8 rounded-full flex items-center justify-center shadow-lg animate-bounce ${duplicates.length > 0 ? 'bg-amber-500' : 'bg-rose-500'}`}>
+              {abnormals.length + duplicates.length}
             </span>
           ) : (
             <span className="absolute top-0 right-0 bg-emerald-500 text-white border-4 border-white size-6 rounded-full flex items-center justify-center shadow-lg">

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { fetchData } from '@/lib/store'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -9,16 +10,37 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const router = useRouter()
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    
     if (username === 'admin' && password === '123123') {
-      // Set cookie to remember login state for 1 day
-      document.cookie = "auth=true; path=/; max-age=86400"
+      document.cookie = "role=ADMIN; path=/; max-age=86400"
+      document.cookie = "auth=true; path=/; max-age=86400" // For backward compatibility
       router.push('/dashboard')
       router.refresh()
-    } else {
-      setError('Tài khoản hoặc mật khẩu không chính xác!')
+      return;
     }
+
+    // Check Employee login
+    if (password === '123123') {
+      try {
+        const data = await fetchData();
+        const emp = data.employees.find(e => e.employee_code.toLowerCase() === username.toLowerCase() || e.employee_id.toLowerCase() === username.toLowerCase());
+        
+        if (emp) {
+          document.cookie = "role=EMPLOYEE; path=/; max-age=86400"
+          document.cookie = `empId=${emp.employee_id}; path=/; max-age=86400`
+          document.cookie = "auth=true; path=/; max-age=86400"
+          router.push('/dashboard')
+          router.refresh()
+          return;
+        }
+      } catch (err) {
+        console.error('Login error:', err)
+      }
+    }
+
+    setError('Tài khoản hoặc mật khẩu không chính xác!')
   }
 
   return (
