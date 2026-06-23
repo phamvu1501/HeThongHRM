@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import type { Attendance } from '@/lib/types';
 import Image from 'next/image';
 
@@ -10,50 +10,7 @@ interface AttendanceBotProps {
 export function AttendanceBot({ abnormals, duplicates = [] }: AttendanceBotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isChatMode, setIsChatMode] = useState(false);
-  const [messages, setMessages] = useState<{role: 'user'|'bot', text: string}[]>([
-    { role: 'bot', text: 'Chào sếp! Sếp cần em giúp gì không?' }
-  ]);
-  const [inputText, setInputText] = useState('');
-  const chatEndRef = useRef<HTMLDivElement>(null);
-
   const todayStr = new Date().toLocaleDateString('vi-VN');
-
-  useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, isChatMode]);
-
-  const handleSend = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!inputText.trim()) return;
-
-    const userMsg = inputText.trim();
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setInputText('');
-
-    setTimeout(() => {
-      let botResponse = 'Dạ em nghe sếp! Sếp cứ dặn dò gì em ghi nhận hết ạ. 😊';
-      const lowerMsg = userMsg.toLowerCase();
-      if (lowerMsg.includes('thời tiết')) {
-        botResponse = 'Thời tiết hôm nay nắng ráo, mát mẻ, rất hợp để anh em làm việc năng suất sếp ạ! 🌤️';
-      } else if (lowerMsg.includes('vui vẻ') || lowerMsg.includes('trò chuyện')) {
-        botResponse = 'Hôm nay công ty vui như trẩy hội sếp ạ! Mọi người đang làm việc cực kỳ nhiệt huyết! 🚀';
-      } else if (lowerMsg.includes('đi muộn') || lowerMsg.includes('trễ') || lowerMsg.includes('vắng')) {
-        botResponse = abnormals.length > 0 
-          ? `Hôm nay có ${abnormals.length} nhân sự đi trễ/về sớm. Sếp có thể bấm "Quay lại" để xem chi tiết danh sách nhé! 🧐`
-          : 'Hôm nay trộm vía không có ai đi muộn hay về sớm sếp ạ! 🎉';
-      } else if (lowerMsg.includes('trùng') || lowerMsg.includes('2 lần')) {
-        botResponse = duplicates.length > 0
-          ? `Cảnh báo sếp ơi, có ${duplicates.length} người chấm công nhiều hơn 1 lần hôm nay. Sếp kiểm tra lại nhé! ⚠️`
-          : 'Hệ thống chấm công hôm nay không ghi nhận trường hợp nào trùng lặp cả sếp ạ! ✅';
-      }
-
-      setMessages(prev => [...prev, { role: 'bot', text: botResponse }]);
-    }, 600);
-  };
-
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {isOpen && (
@@ -64,7 +21,7 @@ export function AttendanceBot({ abnormals, duplicates = [] }: AttendanceBotProps
                  <Image src="/robot-assistant.png" alt="Robot" width={32} height={32} className="object-cover" />
               </div>
               <div>
-                 <h3 className="font-black text-sm leading-tight">Bot Kỷ Luật</h3>
+                 <h3 className="font-black text-sm leading-tight">Cảnh báo bất thường</h3>
                  <p className="text-[10px] font-bold opacity-80 uppercase tracking-widest">Trợ lý HRM</p>
               </div>
             </div>
@@ -79,7 +36,6 @@ export function AttendanceBot({ abnormals, duplicates = [] }: AttendanceBotProps
           </div>
           
           <div className="flex-1 overflow-y-auto bg-slate-50/50 flex flex-col">
-            {!isChatMode ? (
               <div className="p-4">
                 {abnormals.length > 0 ? (
                   <>
@@ -134,46 +90,10 @@ export function AttendanceBot({ abnormals, duplicates = [] }: AttendanceBotProps
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="flex-1 flex flex-col p-4 overflow-hidden">
-                <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-                  {messages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${
-                        msg.role === 'user' 
-                          ? 'bg-[#bde619] text-slate-900 rounded-tr-sm shadow-sm font-medium' 
-                          : 'bg-white border border-slate-200 text-slate-700 rounded-tl-sm shadow-sm'
-                      }`}>
-                        {msg.text}
-                      </div>
-                    </div>
-                  ))}
-                  <div ref={chatEndRef} />
-                </div>
-                <form onSubmit={handleSend} className="mt-3 flex gap-2 shrink-0">
-                  <input 
-                    type="text" 
-                    value={inputText}
-                    onChange={e => setInputText(e.target.value)}
-                    placeholder="Nhập tin nhắn..." 
-                    className="flex-1 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-primary"
-                  />
-                  <button type="submit" className="bg-primary text-slate-900 size-10 rounded-xl flex items-center justify-center hover:bg-primary-dark transition-colors shrink-0">
-                    <span className="material-symbols-outlined text-[18px]">send</span>
-                  </button>
-                </form>
-              </div>
-            )}
           </div>
 
           <div className="p-3 bg-white border-t border-slate-100 flex gap-2 shrink-0">
-             {isChatMode ? (
-               <button onClick={() => setIsChatMode(false)} className="flex-1 text-xs font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 py-2.5 rounded-xl transition-colors">Quay lại danh sách</button>
-             ) : (
-               <button onClick={() => setIsChatMode(true)} className="flex-1 text-xs font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 py-2.5 rounded-xl transition-colors">Trò chuyện</button>
-             )}
-             
-             {!isChatMode && abnormals.length > 0 && (
+             {abnormals.length > 0 && (
                <a href="/cham-cong" className="flex-1 text-xs font-bold text-slate-900 bg-primary hover:bg-primary-dark py-2.5 rounded-xl transition-colors text-center inline-block shadow-sm">Chi tiết</a>
              )}
           </div>

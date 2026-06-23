@@ -186,6 +186,16 @@ export default function DanhMucPage() {
   // ── DELETE ─────────────────────────────────────────────────────────────────
   async function handleDelete() {
     if (!deleteTarget) return
+
+    if (deleteTarget.type === 'Phòng ban') {
+      const hasEmps = employees.some(e => e.department_id === deleteTarget.id)
+      if (hasEmps) {
+        setErrorMsg(`Không thể xóa phòng ban "${deleteTarget.name}" vì vẫn còn nhân viên thuộc phòng ban này.`)
+        setDeleteTarget(null)
+        return
+      }
+    }
+
     setSaving(true)
     setErrorMsg('')
     try {
@@ -331,7 +341,13 @@ export default function DanhMucPage() {
                     <button onClick={() => openEditDept(d)} disabled={saving}
                       className="text-xs font-semibold text-blue-600 hover:underline">Chỉnh sửa</button>
                     <span className="text-slate-300">·</span>
-                    <button onClick={() => setDeleteTarget({ id: d.department_id, name: d.department_name, type: 'Phòng ban' })} disabled={saving}
+                    <button onClick={() => {
+                        if (deptEmps.length > 0) {
+                          alert(`Không thể xóa phòng ban "${d.department_name}" vì đang có ${deptEmps.length} nhân viên trực thuộc.`)
+                        } else {
+                          setDeleteTarget({ id: d.department_id, name: d.department_name, type: 'Phòng ban' })
+                        }
+                      }} disabled={saving}
                       className="text-xs font-semibold text-red-500 hover:underline">Xóa</button>
                   </div>
                 </div>

@@ -53,6 +53,9 @@ export default function NhanVienPage() {
   const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null)
   const [form, setForm] = useState<Employee>(emptyEmp([], []))
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 20
+
   useEffect(() => {
     setLoading(true)
     const authData = getAuth()
@@ -89,6 +92,17 @@ export default function NhanVienPage() {
     const matchStatus = statusFilter === 'all' || e.status === statusFilter
     return matchSearch && matchDept && matchStatus
   }), [enriched, search, deptFilter, statusFilter])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, deptFilter, statusFilter])
+
+  const paginatedEmployees = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    return filtered.slice(start, start + ITEMS_PER_PAGE)
+  }, [filtered, currentPage])
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
 
   function openAdd() {
     setEditTarget(null)
@@ -235,7 +249,7 @@ export default function NhanVienPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {filtered.map(emp => (
+                {paginatedEmployees.map(emp => (
                   <tr key={emp.employee_id} onClick={() => setSelected(emp)}
                     className={`cursor-pointer transition-colors group ${selected?.employee_id === emp.employee_id ? 'bg-[#bde619]/10' : 'hover:bg-slate-50'}`}>
                     <td className="px-5 py-3">
@@ -285,8 +299,29 @@ export default function NhanVienPage() {
           </div>
 
           {/* Footer */}
-          <div className="shrink-0 px-5 py-3 bg-white border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
-            <span>Hiển thị <strong>{filtered.length}</strong> / <strong>{employees.length}</strong> nhân viên</span>
+          <div className="shrink-0 px-5 py-3 bg-white border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+            <span>Hiển thị <strong>{filtered.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}-{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)}</strong> trong số <strong>{filtered.length}</strong> kết quả (Tổng: {employees.length})</span>
+            
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center"
+                >
+                  <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                </button>
+                <span className="px-2 font-medium">Trang {currentPage} / {totalPages}</span>
+                <button 
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="p-1 rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center"
+                >
+                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                </button>
+              </div>
+            )}
+
             <button onClick={() => exportEmployees(filtered)} className="flex items-center gap-1.5 font-semibold hover:text-slate-700 transition-colors">
               <span className="material-symbols-outlined text-[14px]">download</span>Xuất Excel ({filtered.length})
             </button>
