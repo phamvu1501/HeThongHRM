@@ -1,4 +1,4 @@
-# HRM Pro
+# HRM
 
 Ứng dụng HRM mini viết bằng Next.js App Router, giao diện tiếng Việt, tập trung vào 5 nghiệp vụ chính:
 
