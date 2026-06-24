@@ -3,35 +3,55 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-
 // ─── GET ────────────────────────────────────────────────────────────────────────
 export async function GET() {
   try {
-    const departments = await prisma.department.findMany()
-    const positions = await prisma.position.findMany()
-    const shifts = await prisma.shift.findMany()
-    const settings = await prisma.systemSetting.findMany()
-    const logs = await prisma.systemLog.findMany()
-    
-    const employeesRaw = await prisma.employee.findMany({
-      include: {
-        department: true,
-        position: true
-      }
-    })
-    
+    const [
+      departments, positions, shifts, settings, logs,
+      users, salaryHistories, shiftAssignments, payrollPeriods, attendanceAlerts,
+      employeesRaw, attendancesRaw, leaveRequestsRaw, adjustmentsRaw, payrollsRaw
+    ] = await Promise.all([
+      prisma.department.findMany(),
+      prisma.position.findMany(),
+      prisma.shift.findMany(),
+      prisma.systemSetting.findMany(),
+      prisma.systemLog.findMany(),
+      
+      prisma.user.findMany(),
+      prisma.salaryHistory.findMany(),
+      prisma.shiftAssignment.findMany(),
+      prisma.payrollPeriod.findMany(),
+      prisma.attendanceAlert.findMany(),
+
+      prisma.employee.findMany({
+        include: { department: true, position: true }
+      }),
+      
+      prisma.attendance.findMany({
+        include: { employee: true, shift: true }
+      }),
+
+      prisma.leaveRequest.findMany({
+        include: { employee: true }
+      }),
+
+      prisma.adjustment.findMany({
+        include: { employee: true }
+      }),
+
+      prisma.payroll.findMany({
+        include: {
+          employee: { include: { department: true } },
+          period: true
+        }
+      })
+    ])
+
     const employees = employeesRaw.map(e => ({
       ...e,
       department_name: e.department?.department_name || '',
       position_name: e.position?.position_name || ''
     }))
-
-    const attendancesRaw = await prisma.attendance.findMany({
-      include: {
-        employee: true,
-        shift: true
-      }
-    })
 
     const attendances = attendancesRaw.map(a => ({
       ...a,
@@ -39,10 +59,6 @@ export async function GET() {
       shift_name: a.shift?.shift_name || ''
     }))
 
-    const leaveRequestsRaw = await prisma.leaveRequest.findMany({
-      include: { employee: true }
-    })
-    
     const leaveRequests = leaveRequestsRaw.map(l => {
       const approver = employeesRaw.find(e => e.employee_id === l.approved_by)
       return {
@@ -52,23 +68,14 @@ export async function GET() {
       }
     })
 
-    const adjustmentsRaw = await prisma.adjustment.findMany({
-      include: { employee: true }
-    })
-
     const adjustments = adjustmentsRaw.map(a => ({
       ...a,
       employee_name: a.employee?.full_name || ''
     }))
 
-    const payrollsRaw = await prisma.payroll.findMany({
-      include: {
-        employee: { include: { department: true } }
-      }
-    })
-
     const payrolls = payrollsRaw.map(p => ({
       ...p,
+      month: `${p.period?.year}-${p.period?.month}`,
       employee_name: p.employee?.full_name || '',
       department_name: p.employee?.department?.department_name || ''
     }))
@@ -78,7 +85,8 @@ export async function GET() {
     return NextResponse.json({
       departments, positions, shifts,
       employees, attendances, leaveRequests,
-      adjustments, payrolls, settings, logs, enumValues
+      adjustments, payrolls, settings, logs, enumValues,
+      users, salaryHistories, shiftAssignments, payrollPeriods, attendanceAlerts
     })
   } catch (err: any) {
     console.error('[API/data GET]', err)
@@ -206,6 +214,9 @@ export async function POST(req: NextRequest) {
             created_at: e.created_at || new Date().toISOString()
           }
         })
+        
+        // Auto-create history on UI updates is complex via this generic import.
+        // We'll leave the sync as-is for the mock data sheet import but handle the single-save below or in the UI POST.
       }
       const incomingIds = rows.map(r => r.employee_id)
       await prisma.employee.deleteMany({
@@ -221,8 +232,8 @@ export async function POST(req: NextRequest) {
             work_date: a.work_date,
             check_in: a.check_in,
             check_out: a.check_out,
-            work_hours: Number(a.work_hours),
-            overtime_hours: Number(a.overtime_hours),
+            work_minutes: a.work_minutes ? Number(a.work_minutes) : (Number(a.work_hours || 0) * 60),
+            overtime_minutes: a.overtime_minutes ? Number(a.overtime_minutes) : (Number(a.overtime_hours || 0) * 60),
             status: a.status,
             note: a.note || '',
             employee_id: a.employee_id,
@@ -233,8 +244,10 @@ export async function POST(req: NextRequest) {
             work_date: a.work_date,
             check_in: a.check_in,
             check_out: a.check_out,
-            work_hours: Number(a.work_hours),
-            overtime_hours: Number(a.overtime_hours),
+            work_minutes: a.work_minutes ? Number(a.work_minutes) : (Number(a.work_hours || 0) * 60),
+            overtime_minutes: a.overtime_minutes ? Number(a.overtime_minutes) : (Number(a.overtime_hours || 0) * 60),
+            late_minutes: 0,
+            early_leave_minutes: 0,
             status: a.status,
             note: a.note || '',
             employee_id: a.employee_id,
@@ -298,10 +311,26 @@ export async function POST(req: NextRequest) {
     }
     else if (sheet === 'payrolls') {
        for (const p of rows) {
+          if (!p.month) continue;
+          
+          // Ensure period exists
+          const periodId = `PRP_${String(p.month).replace('-', '')}`
+          await prisma.payrollPeriod.upsert({
+             where: { period_id: periodId },
+             update: {},
+             create: {
+                period_id: periodId,
+                month: String(p.month).split('-')[1] || '01',
+                year: String(p.month).split('-')[0] || '2026',
+                state: 'PAID',
+                created_at: new Date().toISOString()
+             }
+          })
+
           await prisma.payroll.upsert({
              where: { payroll_id: p.payroll_id },
              update: {
-                month: p.month,
+                period_id: periodId,
                 base_salary: Number(p.base_salary),
                 work_days_standard: Number(p.work_days_standard),
                 work_days_actual: Number(p.work_days_actual),
@@ -318,7 +347,8 @@ export async function POST(req: NextRequest) {
              },
              create: {
                 payroll_id: p.payroll_id,
-                month: p.month,
+                period_id: periodId,
+                version: 1,
                 base_salary: Number(p.base_salary),
                 work_days_standard: Number(p.work_days_standard),
                 work_days_actual: Number(p.work_days_actual),
@@ -361,7 +391,6 @@ export async function POST(req: NextRequest) {
        }
        count = rows.length
     }
-
 
     return NextResponse.json({ ok: true, sheet, count })
   } catch (err: any) {

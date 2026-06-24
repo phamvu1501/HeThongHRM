@@ -7,6 +7,18 @@ datasource db {
   url       = env("DATABASE_URL")
 }
 
+model User {
+  user_id       String    @id @default(uuid())
+  username      String    @unique
+  password_hash String
+  role          String    @default("EMPLOYEE") // ADMIN, HR, MANAGER, EMPLOYEE
+  status        String    @default("Active")
+  created_at    String
+  
+  employee_id   String?   @unique
+  employee      Employee? @relation(fields: [employee_id], references: [employee_id])
+}
+
 model Department {
   department_id   String     @id
   department_name String
@@ -51,10 +63,37 @@ model Employee {
   position_id     String
   position        Position   @relation(fields: [position_id], references: [position_id])
 
-  attendances     Attendance[]
-  leaveRequests   LeaveRequest[]
-  adjustments     Adjustment[]
-  payrolls        Payroll[]
+  user             User?
+  salaryHistories  SalaryHistory[]
+  shiftAssignments ShiftAssignment[]
+  attendances      Attendance[]
+  leaveRequests    LeaveRequest[]
+  adjustments      Adjustment[]
+  payrolls         Payroll[]
+}
+
+model SalaryHistory {
+  id              String   @id @default(uuid())
+  amount          Float
+  effective_from  String
+  effective_to    String?
+  created_at      String
+  
+  employee_id     String
+  employee        Employee @relation(fields: [employee_id], references: [employee_id])
+}
+
+model ShiftAssignment {
+  id              String   @id @default(uuid())
+  effective_from  String
+  effective_to    String?
+  created_at      String
+  
+  employee_id     String
+  employee        Employee @relation(fields: [employee_id], references: [employee_id])
+  
+  shift_id        String
+  shift           Shift    @relation(fields: [shift_id], references: [shift_id])
 }
 
 model Shift {
@@ -66,24 +105,41 @@ model Shift {
   work_hours      Float
   status          String     @default("Active")
 
-  attendances     Attendance[]
+  attendances      Attendance[]
+  shiftAssignments ShiftAssignment[]
 }
 
 model Attendance {
-  attendance_id   String     @id
-  work_date       String
-  check_in        String
-  check_out       String
-  work_hours      Float
-  overtime_hours  Float
-  status          String
-  note            String
+  attendance_id         String     @id
+  work_date             String
+  check_in              String
+  check_out             String
+  work_minutes          Int?
+  overtime_minutes      Int?
+  late_minutes          Int?
+  early_leave_minutes   Int?
+  status                String
+  note                  String
 
-  employee_id     String
-  employee        Employee   @relation(fields: [employee_id], references: [employee_id])
+  employee_id           String
+  employee              Employee   @relation(fields: [employee_id], references: [employee_id])
 
-  shift_id        String
-  shift           Shift      @relation(fields: [shift_id], references: [shift_id])
+  shift_id              String
+  shift                 Shift      @relation(fields: [shift_id], references: [shift_id])
+  
+  alerts                AttendanceAlert[]
+}
+
+model AttendanceAlert {
+  alert_id        String     @id @default(uuid())
+  severity        String     // LOW, MEDIUM, HIGH
+  status          String     @default("PENDING") // PENDING, RESOLVED
+  created_at      String
+  resolved_by     String?
+  resolved_at     String?
+
+  attendance_id   String
+  attendance      Attendance @relation(fields: [attendance_id], references: [attendance_id])
 }
 
 model LeaveRequest {
@@ -113,9 +169,21 @@ model Adjustment {
   employee        Employee   @relation(fields: [employee_id], references: [employee_id])
 }
 
+model PayrollPeriod {
+  period_id       String     @id
+  month           String
+  year            String
+  state           String     @default("OPEN") // OPEN, CALCULATED, REVIEW, LOCKED, PAID
+  locked_by       String?
+  locked_at       String?
+  created_at      String
+  
+  payrolls        Payroll[]
+}
+
 model Payroll {
   payroll_id         String     @id
-  month              String
+  version            Int        @default(1)
   base_salary        Float
   work_days_standard Float
   work_days_actual   Float
@@ -132,6 +200,9 @@ model Payroll {
 
   employee_id        String
   employee           Employee   @relation(fields: [employee_id], references: [employee_id])
+  
+  period_id          String
+  period             PayrollPeriod @relation(fields: [period_id], references: [period_id])
 }
 
 model SystemSetting {

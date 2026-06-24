@@ -5,8 +5,8 @@
 export type Status = 'Active' | 'Inactive'
 export type ContractType = 'Full-time' | 'Part-time' | 'Probation' | 'Contract'
 export type Gender = 'Nam' | 'Nữ' | 'Khác'
-export type AttendanceStatus = 'Đúng giờ' | 'Đi trễ' | 'Về sớm' | 'Vắng mặt' | 'Tăng ca' | 'Nghỉ phép'
-export type LeaveStatus = 'Chờ duyệt' | 'Đã duyệt' | 'Từ chối'
+export type AttendanceStatus = 'Đúng giờ' | 'Đi trễ' | 'Về sớm' | 'Vắng mặt' | 'Tăng ca' | 'Nghỉ phép' | 'MISSING_CHECKOUT' | 'LEAVE_APPROVED' | 'ABSENT' | 'LATE' | 'ON_TIME'
+export type LeaveStatus = 'Chờ duyệt' | 'Đã duyệt' | 'Từ chối' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED'
 export type LeaveType = 'Nghỉ phép năm' | 'Nghỉ ốm' | 'Nghỉ không lương' | 'Nghỉ chế độ' | 'Việc riêng'
 export type PayrollStatus = 'Chưa thanh toán' | 'Đã thanh toán' | 'Đang xử lý'
 export type LogAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'APPROVE' | 'REJECT'
@@ -22,6 +22,19 @@ export interface SystemSetting {
   setting_type: 'string' | 'number' | 'boolean' | 'time'
   description: string
   updated_at: string
+}
+
+// ========================
+// USER (RBAC)
+// ========================
+export interface User {
+  user_id: string
+  username: string
+  password_hash: string
+  role: string
+  status: string
+  created_at: string
+  employee_id?: string
 }
 
 // ========================
@@ -42,7 +55,7 @@ export interface Department {
 export interface Position {
   position_id: string
   position_name: string
-  level: 'Director' | 'Manager' | 'Senior' | 'Staff' | 'Junior' | 'Intern'
+  level: 'Director' | 'Manager' | 'Senior' | 'Staff' | 'Junior' | 'Intern' | string
   salary_band_min: number
   salary_band_max: number
   status: Status
@@ -64,13 +77,34 @@ export interface Employee {
   position_id: string
   join_date: string
   contract_type: ContractType
-  base_salary: number
+  base_salary: number // we keep this for UI simplicity, but behind the scenes we use SalaryHistory
   bank_account_no: string
   status: Status
   created_at: string
   // computed
   department_name?: string
   position_name?: string
+}
+
+// ========================
+// SALARY HISTORY & SHIFT ASSIGNMENT
+// ========================
+export interface SalaryHistory {
+  id: string
+  amount: number
+  effective_from: string
+  effective_to?: string | null
+  created_at: string
+  employee_id: string
+}
+
+export interface ShiftAssignment {
+  id: string
+  effective_from: string
+  effective_to?: string | null
+  created_at: string
+  employee_id: string
+  shift_id: string
 }
 
 // ========================
@@ -87,7 +121,7 @@ export interface Shift {
 }
 
 // ========================
-// ATTENDANCE
+// ATTENDANCE & ALERT
 // ========================
 export interface Attendance {
   attendance_id: string
@@ -96,13 +130,25 @@ export interface Attendance {
   shift_id: string
   check_in: string
   check_out: string
-  work_hours: number
-  overtime_hours: number
-  status: AttendanceStatus
+  work_minutes?: number | null
+  overtime_minutes?: number | null
+  late_minutes?: number | null
+  early_leave_minutes?: number | null
+  status: AttendanceStatus | string
   note: string
   // computed
   employee_name?: string
   shift_name?: string
+}
+
+export interface AttendanceAlert {
+  alert_id: string
+  severity: string // LOW, MEDIUM, HIGH
+  status: string // PENDING, RESOLVED
+  created_at: string
+  resolved_by?: string | null
+  resolved_at?: string | null
+  attendance_id: string
 }
 
 // ========================
@@ -111,12 +157,12 @@ export interface Attendance {
 export interface LeaveRequest {
   leave_id: string
   employee_id: string
-  leave_type: LeaveType
+  leave_type: LeaveType | string
   from_date: string
   to_date: string
   days: number
   reason: string
-  status: LeaveStatus
+  status: LeaveStatus | string
   approved_by: string
   created_at: string
   // computed
@@ -131,7 +177,7 @@ export interface Adjustment {
   adj_id: string
   month: string
   employee_id: string
-  adj_type: AdjType
+  adj_type: AdjType | string
   amount: number
   description: string
   created_at: string
@@ -140,11 +186,22 @@ export interface Adjustment {
 }
 
 // ========================
-// PAYROLL
+// PAYROLL & PAYROLL PERIOD
 // ========================
+export interface PayrollPeriod {
+  period_id: string
+  month: string
+  year: string
+  state: string // OPEN, CALCULATED, REVIEW, LOCKED, PAID
+  locked_by?: string | null
+  locked_at?: string | null
+  created_at: string
+}
+
 export interface Payroll {
   payroll_id: string
-  month: string
+  version: number
+  period_id: string
   employee_id: string
   base_salary: number
   work_days_standard: number
@@ -158,11 +215,12 @@ export interface Payroll {
   pit: number
   net_pay: number
   pay_date: string
-  status: PayrollStatus
+  status: PayrollStatus | string
   // computed
   employee_name?: string
   department_name?: string
   position_name?: string
+  month?: string // for backward compat with UI
 }
 
 // ========================
@@ -172,7 +230,7 @@ export interface SystemLog {
   log_id: string
   log_time: string
   user: string
-  action: LogAction
+  action: LogAction | string
   entity_type: string
   entity_id: string
   description: string
@@ -217,4 +275,10 @@ export interface AppData {
   payrolls: Payroll[]
   logs: SystemLog[]
   enumValues: EnumValue[]
+  
+  users?: User[]
+  salaryHistories?: SalaryHistory[]
+  shiftAssignments?: ShiftAssignment[]
+  payrollPeriods?: PayrollPeriod[]
+  attendanceAlerts?: AttendanceAlert[]
 }

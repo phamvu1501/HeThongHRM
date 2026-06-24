@@ -38,8 +38,8 @@ export function exportAttendances(records: Attendance[]) {
     'Ca làm': a.shift_name ?? a.shift_id,
     'Giờ vào': a.check_in || '—',
     'Giờ ra': a.check_out || '—',
-    'Giờ làm': a.work_hours,
-    'Tăng ca (h)': a.overtime_hours,
+    'Phút làm': a.work_minutes,
+    'Phút tăng ca': a.overtime_minutes,
     'Trạng thái': a.status,
     'Ghi chú': a.note,
   }))
@@ -167,7 +167,7 @@ export function exportAllData(data: {
     'Ngày': a.work_date, 'Nhân viên': a.employee_name ?? a.employee_id,
     'Ca làm': a.shift_name ?? a.shift_id,
     'Giờ vào': a.check_in, 'Giờ ra': a.check_out,
-    'Giờ làm': a.work_hours, 'Tăng ca': a.overtime_hours,
+    'Phút làm': a.work_minutes, 'Phút tăng ca': a.overtime_minutes,
     'Trạng thái': a.status, 'Ghi chú': a.note,
   }))
   const ws2 = XLSX.utils.json_to_sheet(attRows); autoWidth(ws2)

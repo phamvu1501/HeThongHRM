@@ -13,31 +13,23 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (username === 'admin' && password === '123123') {
-      document.cookie = "role=ADMIN; path=/; max-age=86400"
-      document.cookie = "auth=true; path=/; max-age=86400" // For backward compatibility
-      router.push('/dashboard')
-      router.refresh()
-      return;
-    }
-
-    // Check Employee login
-    if (password === '123123') {
-      try {
-        const data = await fetchData();
-        const emp = data.employees.find(e => e.employee_code.toLowerCase() === username.toLowerCase() || e.employee_id.toLowerCase() === username.toLowerCase());
-        
-        if (emp) {
-          document.cookie = "role=EMPLOYEE; path=/; max-age=86400"
-          document.cookie = `empId=${emp.employee_id}; path=/; max-age=86400`
-          document.cookie = "auth=true; path=/; max-age=86400"
-          router.push('/dashboard')
-          router.refresh()
-          return;
+    try {
+      const data = await fetchData();
+      const users = data.users || [];
+      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password_hash === password);
+      
+      if (user) {
+        document.cookie = `role=${user.role}; path=/; max-age=86400`
+        if (user.employee_id) {
+           document.cookie = `empId=${user.employee_id}; path=/; max-age=86400`
         }
-      } catch (err) {
-        console.error('Login error:', err)
+        document.cookie = "auth=true; path=/; max-age=86400"
+        router.push('/dashboard')
+        router.refresh()
+        return;
       }
+    } catch (err) {
+      console.error('Login error:', err)
     }
 
     setError('Tài khoản hoặc mật khẩu không chính xác!')

@@ -1,0 +1,1912 @@
+BỘ NÔNG NGHIỆP VÀ MÔI TRƯỜNGTRƯỜNG ĐẠI HỌC THỦY LỢI
+PHẠM ĐÔNG VŨ
+XÂY DỰNG HỆ THỐNG QUẢN LÝ NHÂN SỰ, CHẤM CÔNGVÀ DASHBOARD GIÁM SÁT CHO DOANH NGHIỆPTRÊN NỀN TẢNG WEB
+ĐỒ ÁN TỐT NGHIỆP
+HÀ NỘI, NĂM 2026
+BỘ NÔNG NGHIỆP VÀ MÔI TRƯỜNGTRƯỜNG ĐẠI HỌC THỦY LỢI
+KHOA CÔNG NGHỆ THÔNG TIN
+PHẠM ĐÔNG VŨ
+XÂY DỰNG HỆ THỐNG QUẢN LÝ NHÂN SỰ, CHẤM CÔNGVÀ DASHBOARD GIÁM SÁT CHO DOANH NGHIỆPTRÊN NỀN TẢNG WEB
+ĐỒ ÁN TỐT NGHIỆP
+Ngành
+Kỹ thuật phần mềm
+Mã ngành
+7480103
+Mã sinh viên
+........................................
+Lớp
+........................................
+Người hướng dẫn
+PGS.TS. Lê Văn Hưng
+HÀ NỘI, NĂM 2026
+LỜI CAM ĐOAN
+Tác giả xin cam đoan đồ án tốt nghiệp này là kết quả nghiên cứu, phân tích, thiết kế và xây dựng của bản thân dưới sự hướng dẫn của giảng viên. Các mô hình, số liệu minh họa, kết quả kiểm thử và nhận xét được trình bày trung thực trong phạm vi dữ liệu thử nghiệm; mọi tài liệu, tiêu chuẩn, công nghệ và ý tưởng tham khảo đều được trích dẫn trong nội dung và liệt kê tại phần Tài liệu tham khảo.
+Tác giả chịu trách nhiệm về tính chính xác của nội dung, tính hợp lệ của dữ liệu thử nghiệm và việc tuân thủ các nguyên tắc đạo đức học thuật. Mã nguồn, dữ liệu mẫu và tài liệu thiết kế của đề tài được sử dụng cho mục đích học tập, nghiên cứu và đánh giá đồ án; không sử dụng dữ liệu nhân sự thật có khả năng nhận dạng cá nhân khi chưa được phép.
+Tác giả đồ ánPhạm Đông Vũ
+LỜI CẢM ƠN
+Em xin bày tỏ lòng biết ơn sâu sắc tới Ban Giám hiệu Trường Đại học Thủy lợi, Khoa Công nghệ thông tin và toàn thể quý thầy cô đã trang bị nền tảng kiến thức về phân tích thiết kế hệ thống, cơ sở dữ liệu, lập trình web, kiểm thử phần mềm và quản trị dự án. Những kiến thức đó là cơ sở quan trọng để em triển khai đề tài theo hướng có hệ thống và có khả năng kiểm chứng.
+Em xin trân trọng cảm ơn giảng viên hướng dẫn thầy Lê Văn Hưng đã dành thời gian nhận xét chi tiết về cấu trúc báo cáo, chất lượng mô hình use case, chiều sâu thiết kế dữ liệu, chuỗi xử lý chấm công - nghỉ phép - bảng lương - dashboard và phương pháp kiểm thử. Các góp ý là căn cứ trực tiếp để em chỉnh sửa lại Chương 3, bổ sung minh chứng cho Chương 4, tăng số liệu và test case ở Chương 5, đồng thời chuẩn hóa hình thức trình bày và tài liệu tham khảo.
+Em cũng cảm ơn gia đình, bạn bè và những người đã hỗ trợ trao đổi nghiệp vụ, góp ý giao diện và tham gia thử nghiệm. Mặc dù đã cố gắng hoàn thiện, báo cáo khó tránh khỏi hạn chế do thời gian, phạm vi dữ liệu và kinh nghiệm thực tế. Em kính mong tiếp tục nhận được ý kiến đóng góp để hoàn thiện sản phẩm trong tương lai.
+TÓM TẮT ĐỒ ÁN
+Đề tài xây dựng hệ thống quản lý nhân sự trên nền tảng web cho doanh nghiệp vừa và nhỏ, tập trung vào bảy nhóm nghiệp vụ: quản lý danh mục, hồ sơ nhân viên, chấm công, nghỉ phép, bảng lương, dashboard giám sát và xác thực - phân quyền. Mục tiêu của hệ thống là thay thế cách quản lý rời rạc bằng bảng tính, hình thành một nguồn dữ liệu tập trung, giảm thao tác lặp, tăng khả năng truy vết và cung cấp thông tin quản trị kịp thời.
+Giá trị kỹ thuật trung tâm của đề tài là chuỗi xử lý liên thông chấm công - nghỉ phép - bảng lương - dashboard. Dữ liệu check-in/check-out được chuẩn hóa theo ca, xử lý ca qua ngày, tính số phút đi muộn, phút làm việc và tăng ca; đơn nghỉ chỉ tác động tới bảng công khi được phê duyệt; bảng lương sử dụng snapshot dữ liệu công và lương có hiệu lực trong kỳ; các thay đổi sau khi khóa kỳ được kiểm soát bằng trạng thái, phiên bản và nhật ký. Dashboard tổng hợp KPI theo bộ lọc, sử dụng truy vấn tại thời điểm yêu cầu kết hợp cache ngắn, vì vậy được xác định là gần thời gian thực chứ không phải streaming.
+Báo cáo trình bày quá trình khảo sát, xác định yêu cầu, mô hình hóa 26 use case, thiết kế kiến trúc phân tầng, biểu đồ lớp, ERD, lược đồ cơ sở dữ liệu, quy tắc nghiệp vụ, thiết kế bảo mật và giao diện. Phần xây dựng mô tả đầu vào/đầu ra của từng mô-đun, ví dụ tính công, tính lương, cảnh báo và triển khai. Phần kiểm thử sử dụng test case chức năng, giá trị biên, bảng quyết định, chuyển trạng thái, phân quyền và đo hiệu năng trên dữ liệu mẫu. Kết quả cho thấy giải pháp đáp ứng các chức năng cốt lõi trong phạm vi đồ án, đồng thời còn các hạn chế về tích hợp thiết bị chấm công, chính sách lương thực tế, đa chi nhánh và phân tích nâng cao.
+Từ khóa: quản lý nhân sự; chấm công; nghỉ phép; bảng lương; dashboard; RBAC; cảnh báo bất thường; ứng dụng web.
+MỤC LỤC
+LỜI CAM ĐOANi
+LỜI CẢM ƠNii
+TÓM TẮT ĐỒ ÁNiii
+MỤC LỤCiv
+DANH MỤC HÌNH ẢNHix
+DANH MỤC BẢNG BIỂUxi
+DANH MỤC TỪ VIẾT TẮTxiv
+PHẦN MỞ ĐẦU1
+1. Lý do chọn đề tài1
+2. Mục tiêu nghiên cứu và xây dựng hệ thống1
+3. Đối tượng và phạm vi nghiên cứu2
+4. Phương pháp thực hiện2
+5. Đóng góp chính của đồ án2
+6. Cấu trúc báo cáo3
+CHƯƠNG 1. TỔNG QUAN BÀI TOÁN VÀ ĐỊNH HƯỚNG GIẢI PHÁP4
+1.1. Bối cảnh quản trị nhân sự trong doanh nghiệp4
+1.2. Quy trình nghiệp vụ hiện tại và các điểm nghẽn4
+1.3. Các bên liên quan và nhu cầu5
+1.4. Bài toán kỹ thuật trung tâm5
+1.5. Định hướng giải pháp6
+1.6. Tiêu chí đánh giá thành công6
+1.7. Kết luận chương6
+CHƯƠNG 2. CƠ SỞ LÝ THUYẾT VÀ CÔNG NGHỆ SỬ DỤNG8
+2.1. Hệ thống quản lý nguồn nhân lực và phân loại dữ liệu8
+2.2. Cơ sở lý thuyết về chấm công8
+2.3. Quản lý nghỉ phép và chuyển trạng thái9
+2.4. Cơ sở tính lương và tính bất biến của kỳ lương9
+2.5. Dashboard, KPI và mức độ tươi mới của dữ liệu9
+2.6. Phát hiện bất thường dựa trên luật10
+2.7. Kiến trúc phân tầng, transaction và chỉ mục10
+2.8. Xác thực, quản lý phiên, RBAC và nhật ký10
+2.9. Công nghệ sử dụng11
+2.10. Kết luận chương12
+CHƯƠNG 3. PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG14
+3.1. Mối liên hệ giữa yêu cầu, use case, kiến trúc và dữ liệu14
+3.2. Phân tích yêu cầu chức năng14
+3.3. Yêu cầu phi chức năng15
+3.4. Tác nhân và mô hình phân quyền15
+3.5. Mô hình use case18
+3.5.1. Danh sách 26 use case18
+3.5.2. Đặc tả các use case cốt lõi18
+3.5.3. Ma trận truy vết yêu cầu - use case - mô-đun - kiểm thử20
+3.6. Thiết kế kiến trúc tổng thể20
+3.7. Biểu đồ lớp và mô hình miền22
+3.8. Thiết kế cơ sở dữ liệu23
+3.8.1. Phân loại thực thể23
+3.8.2. Ràng buộc và chỉ mục23
+3.8.3. Thiết kế dữ liệu hiệu lực và snapshot24
+3.9. Thiết kế chuỗi xử lý chấm công - nghỉ phép - bảng lương - dashboard25
+3.9.1. Xử lý chấm công25
+3.9.2. Đồng bộ đơn nghỉ đã duyệt26
+3.9.3. Kiểm soát thay đổi sau khi bảng lương đã chốt26
+3.9.4. Mức độ cập nhật dashboard27
+3.10. Thiết kế xác thực và bảo mật27
+3.11. Thiết kế giao diện người dùng28
+3.12. Kết luận chương28
+CHƯƠNG 4. XÂY DỰNG VÀ TRIỂN KHAI HỆ THỐNG29
+4.1. Môi trường phát triển và tổ chức mã nguồn29
+4.2. Xây dựng cơ sở dữ liệu và migration29
+4.3. Xây dựng mô-đun xác thực và phân quyền30
+4.4. Xây dựng mô-đun danh mục và nhân sự30
+4.5. Xây dựng mô-đun chấm công31
+4.6. Xây dựng mô-đun nghỉ phép33
+4.7. Xây dựng mô-đun bảng lương34
+4.8. Xây dựng dashboard và truy vấn phân tích35
+4.9. Xây dựng nhật ký và cảnh báo bất thường36
+4.10. Xuất báo cáo và khả năng sử dụng36
+4.11. Triển khai hệ thống37
+4.12. Mức độ hoàn thiện và minh chứng37
+4.13. Kết luận chương38
+CHƯƠNG 5. KIỂM THỬ VÀ ĐÁNH GIÁ HỆ THỐNG39
+5.1. Mục tiêu và chiến lược kiểm thử39
+5.2. Môi trường và dữ liệu kiểm thử39
+5.3. Kiểm thử chức năng tổng quát39
+5.4. Kiểm thử tính toán chấm công40
+5.5. Kiểm thử nghỉ phép và đồng bộ bảng công40
+5.6. Kiểm thử bảng lương41
+5.7. Kiểm thử bảo mật và phân quyền41
+5.8. Kiểm thử hiệu năng42
+5.9. Đánh giá khả năng sử dụng43
+5.10. Đánh giá mức độ hoàn thành43
+5.11. Hạn chế của hệ thống44
+5.12. Kết luận chương44
+KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN45
+1. Kết luận45
+2. Hướng phát triển45
+TÀI LIỆU THAM KHẢO46
+PHỤ LỤC48
+Phụ lục A. Từ điển dữ liệu chi tiết48
+Phụ lục B. Giả mã xử lý nghiệp vụ48
+B.1. Xác định trạng thái chấm công48
+B.2. Phê duyệt đơn nghỉ49
+B.3. Tính và khóa bảng lương49
+Phụ lục C. Bộ dữ liệu và test case mẫu49
+Phụ lục D. Hướng dẫn sử dụng tóm tắt50
+Phụ lục E. Đối chiếu nội dung chỉnh sửa theo góp ý50
+Phụ lục F. Mẫu gáy bìa (in riêng)51
+DANH MỤC HÌNH ẢNH
+Hình 1. Sơ đồ ngữ cảnh của hệ thống quản lý nhân sự4
+Hình 2. Luồng dữ liệu cốt lõi nhân viên - chấm công - nghỉ phép - bảng lương - dashboard6
+Hình 3. Kiến trúc công nghệ phân tầng đề xuất12
+Hình 4. Sơ đồ use case tổng quát và quan hệ giữa các tác nhân17
+Hình 5. Mô hình kiến trúc phân tầng của hệ thống21
+Hình 6. Biểu đồ lớp miền nghiệp vụ HRM22
+Hình 7. ERD và phân loại master, transactional, analytics/log data23
+Hình 8. Quy trình xác định trạng thái và số phút chấm công25
+Hình 9. Vòng đời đơn nghỉ và bước đồng bộ với bảng công26
+Hình 10. Vòng đời kỳ lương và xử lý thay đổi sau khóa26
+Hình 11. Sequence kiểm tra kỳ lương khi yêu cầu sửa chấm công27
+Hình 12. Thiết kế tổng hợp và mức độ tươi mới của dashboard27
+Hình 13. Sơ đồ trình tự đăng nhập, tạo phiên và kiểm tra quyền27
+Hình 14. Mô phỏng giao diện đăng nhập của hệ thống30
+Hình 15. Mô phỏng giao diện danh sách nhân viên, bộ lọc và thao tác31
+Hình 16. Mô phỏng giao diện chấm công theo ngày và kết quả tính tự động31
+Hình 17. Mô phỏng giao diện quản lý, phê duyệt và tra cứu đơn nghỉ33
+Hình 18. Mô phỏng giao diện kỳ lương, chi tiết thành phần và trạng thái khóa34
+Hình 19. Mô phỏng dashboard KPI, cơ cấu nhân sự, quỹ lương và cảnh báo35
+Hình 20. Mô phỏng giao diện cảnh báo và nhật ký hoạt động36
+Hình 21. Mô hình triển khai với reverse proxy, ứng dụng, cơ sở dữ liệu và giám sát37
+Hình 22. Quy trình thiết kế, thực thi, sửa lỗi và kiểm thử hồi quy39
+Hình 23. Biểu đồ thời gian phản hồi trung bình và P95 trong môi trường thử nghiệm42
+Hình 24. Phân bố test case theo mô-đun43
+Hình 25. Mẫu nội dung gáy bìa của đồ án52
+DANH MỤC BẢNG BIỂU
+Bảng 1. Danh mục từ viết tắtxii
+Bảng 2. Các giai đoạn thực hiện đề tài2
+Bảng 3. Các vấn đề của phương pháp quản lý rời rạc4
+Bảng 4. Các bên liên quan của hệ thống5
+Bảng 5. Tiêu chí đánh giá đề tài6
+Bảng 6. Công thức và quy tắc chấm công cơ bản8
+Bảng 7. Thành phần tính lương9
+Bảng 8. Lý do lựa chọn công nghệ triển khai11
+Bảng 9. Danh sách yêu cầu chức năng đã chuẩn hóa14
+Bảng 10. Yêu cầu phi chức năng và tiêu chí chấp nhận15
+Bảng 11. Ma trận quyền theo vai trò và phạm vi15
+Bảng 12. Danh sách use case và tác nhân18
+Bảng 13. Đặc tả UC-10 - Cập nhật chấm công đơn lẻ18
+Bảng 14. Đặc tả UC-15 - Duyệt/từ chối đơn nghỉ18
+Bảng 15. Đặc tả UC-16 - Đồng bộ nghỉ phép với bảng công19
+Bảng 16. Đặc tả UC-18 - Tính bảng lương19
+Bảng 17. Đặc tả UC-20 - Khóa/mở lại kỳ lương19
+Bảng 18. Đặc tả UC-22 - Xem dashboard19
+Bảng 19. Đặc tả UC-23 - Xử lý cảnh báo19
+Bảng 20. Đặc tả UC-26 - Quản trị tài khoản và phân quyền20
+Bảng 21. Ma trận truy vết các luồng cốt lõi20
+Bảng 22. Giải thích các thực thể chính23
+Bảng 23. Ràng buộc toàn vẹn dữ liệu24
+Bảng 24. Chỉ mục dữ liệu đề xuất24
+Bảng 25. Bảng quyết định trạng thái chấm công25
+Bảng 26. Quy tắc xử lý thay đổi dữ liệu theo trạng thái kỳ lương27
+Bảng 27. Các kiểm soát bảo mật chính27
+Bảng 28. Nguyên tắc thiết kế giao diện28
+Bảng 29. Môi trường và công cụ phát triển29
+Bảng 30. Ví dụ đầu vào và kết quả tính chấm công32
+Bảng 31. Ví dụ sự kiện phê duyệt đơn nghỉ và đồng bộ dữ liệu33
+Bảng 32. Ví dụ minh họa tính lương cho một nhân viên34
+Bảng 33. Các luật cảnh báo mặc định36
+Bảng 34. Ví dụ một sự kiện audit log36
+Bảng 35. Tổng hợp đầu vào, đầu ra và mức hoàn thiện các mô-đun37
+Bảng 36. Cấu hình môi trường và dữ liệu kiểm thử39
+Bảng 37. Kết quả kiểm thử chức năng tiêu biểu39
+Bảng 38. Kiểm thử giá trị biên và tình huống chấm công40
+Bảng 39. Test case nghỉ phép và đồng bộ công40
+Bảng 40. Test case bảng lương và trạng thái kỳ41
+Bảng 41. Đối chiếu phép tính lương minh họa41
+Bảng 42. Kết quả kiểm thử bảo mật, quyền và đồng thời41
+Bảng 43. Kết quả hiệu năng tham khảo42
+Bảng 44. Checklist đánh giá khả năng sử dụng43
+Bảng 45. Đối chiếu mục tiêu và kết quả đạt được43
+Bảng 46. Từ điển dữ liệu các trường quan trọng48
+Bảng 47. Dữ liệu nhân viên mẫu49
+Bảng 48. Mẫu cấu trúc test case chi tiết50
+Bảng 49. Bảng đối chiếu góp ý của giảng viên và nội dung đã chỉnh sửa50
+DANH MỤC TỪ VIẾT TẮT
+Bảng 1. Danh mục từ viết tắt
+Từ viết tắt
+Giải thích
+API
+Application Programming Interface - Giao diện lập trình ứng dụng
+CCCD
+Căn cước công dân
+CRUD
+Create, Read, Update, Delete
+ERD
+Entity Relationship Diagram - Sơ đồ thực thể liên kết
+HRM
+Human Resource Management - Quản lý nguồn nhân lực
+KPI
+Key Performance Indicator - Chỉ số hiệu quả chính
+MVCC
+Multi-Version Concurrency Control - Kiểm soát đồng thời đa phiên bản
+ORM
+Object-Relational Mapping
+RBAC
+Role-Based Access Control - Kiểm soát truy cập theo vai trò
+SSR
+Server-Side Rendering
+TNCN
+Thuế thu nhập cá nhân
+UI/UX
+Giao diện người dùng / Trải nghiệm người dùng
+UML
+Unified Modeling Language - Ngôn ngữ mô hình hóa thống nhất
+PHẦN MỞ ĐẦU
+1. Lý do chọn đề tài
+Nguồn nhân lực là yếu tố trực tiếp ảnh hưởng đến khả năng vận hành và phát triển của doanh nghiệp. Khi quy mô nhân sự tăng, số lượng hồ sơ, hợp đồng, lịch làm việc, bản ghi chấm công, đơn nghỉ và bảng lương tăng nhanh, đồng thời xuất hiện nhiều quan hệ phụ thuộc giữa các dữ liệu. Cách quản lý bằng biểu mẫu giấy hoặc nhiều tệp bảng tính riêng lẻ thường dẫn đến trùng lặp, sai phiên bản, khó kiểm soát quyền truy cập và khó xác định nguyên nhân khi số liệu không khớp.
+Một hệ thống web tập trung có thể chuẩn hóa dữ liệu, tự động hóa quy tắc, kiểm soát trạng thái và cung cấp khả năng truy vết. Tuy nhiên, xây dựng hệ thống HRM không chỉ là triển khai các màn hình CRUD. Bài toán khó nằm ở việc bảo đảm dữ liệu công, nghỉ phép, lương và dashboard phản ánh cùng một sự thật nghiệp vụ tại từng thời điểm. Các quy tắc phải xử lý dữ liệu thiếu, ca qua ngày, nghỉ đã duyệt, thay đổi lương theo hiệu lực và chỉnh sửa sau khi kỳ lương đã khóa.
+Bên cạnh nghiệp vụ giao dịch, ban lãnh đạo và phòng nhân sự cần dashboard để theo dõi tỷ lệ đúng giờ, cơ cấu nhân sự, đơn chờ duyệt, quỹ lương và cảnh báo bất thường. Việc tích hợp lớp giám sát với dữ liệu vận hành giúp rút ngắn thời gian tổng hợp và hỗ trợ phát hiện sớm các trường hợp cần xử lý. Vì vậy, đề tài lựa chọn xây dựng hệ thống quản lý nhân sự, chấm công và dashboard giám sát trên nền tảng web.
+2. Mục tiêu nghiên cứu và xây dựng hệ thống
+Xây dựng cơ sở dữ liệu tập trung cho phòng ban, chức vụ, ca làm việc, nhân viên, lịch sử lương, phân ca, chấm công, nghỉ phép, bảng lương, nhật ký và cảnh báo.
+Phân tích và mô hình hóa đầy đủ yêu cầu bằng use case, kiến trúc phân tầng, biểu đồ lớp, ERD, trạng thái và luồng dữ liệu.
+Tự động xác định trạng thái chấm công, số phút đi muộn, phút làm việc, tăng ca và các tình huống ngoại lệ.
+Liên kết đơn nghỉ đã duyệt với bảng công; kiểm soát thay đổi dữ liệu khi bảng lương đã tính, khóa hoặc thanh toán.
+Tính bảng lương theo tham số cấu hình và snapshot dữ liệu trong kỳ, trình bày rõ Gross, Net và các thành phần.
+Xây dựng dashboard gần thời gian thực theo truy vấn, có KPI, biểu đồ, lịch nghỉ, sinh nhật, log và cảnh báo.
+Thiết lập xác thực, quản lý phiên, RBAC, giới hạn phạm vi dữ liệu, validation phía máy chủ và audit log.
+Kiểm thử chức năng, công thức, chuyển trạng thái, bảo mật - phân quyền, hiệu năng và khả năng sử dụng.
+3. Đối tượng và phạm vi nghiên cứu
+Đối tượng nghiên cứu là quy trình quản trị nhân sự nội bộ tại doanh nghiệp vừa và nhỏ. Các nhóm người dùng chính gồm quản trị viên/phòng nhân sự, quản lý phòng ban và nhân viên. Trong mô hình quyền, quản lý phòng ban được xem là vai trò chuyên biệt của nhân viên, có thêm quyền giám sát và phê duyệt trong phạm vi đơn vị.
+Phạm vi chức năng gồm quản lý danh mục, hồ sơ nhân viên, chấm công, nghỉ phép, bảng lương, dashboard, cảnh báo, tài khoản và phân quyền. Đề tài không thay thế toàn bộ ERP; không triển khai tuyển dụng, đào tạo, đánh giá năng lực, kế toán tổng hợp hoặc chính sách thuế - bảo hiểm đầy đủ theo từng doanh nghiệp. Công thức lương trong báo cáo được tham số hóa và dùng dữ liệu minh họa; trước khi áp dụng thật phải được bộ phận nhân sự, kế toán và pháp chế xác nhận.
+Mô-đun bất thường sử dụng luật có thể giải thích, chưa sử dụng mô hình học máy. Dữ liệu chấm công được nhập trực tiếp hoặc import, chưa kết nối thiết bị vân tay, nhận diện khuôn mặt hoặc GPS. Dashboard được cập nhật gần thời gian thực khi người dùng truy vấn hoặc khi cache hết hạn; đề tài chưa xây dựng hạ tầng streaming.
+4. Phương pháp thực hiện
+Bảng 2. Các giai đoạn thực hiện đề tài
+Giai đoạn
+Nội dung chính
+Đầu ra
+Khảo sát
+Xác định bên liên quan, quy trình hiện tại, vấn đề và phạm vi
+Biên bản yêu cầu và phạm vi
+Phân tích
+Mô hình hóa yêu cầu, use case, trạng thái và quy tắc
+Đặc tả yêu cầu
+Thiết kế
+Thiết kế kiến trúc, dữ liệu, bảo mật, giao diện và luồng trung tâm
+Bộ mô hình thiết kế
+Xây dựng
+Triển khai cơ sở dữ liệu, dịch vụ, giao diện, dashboard và cảnh báo
+Ứng dụng web thử nghiệm
+Kiểm thử
+Unit, integration, chức năng, biên, phân quyền, hiệu năng
+Bộ test case và kết quả
+Đánh giá
+Đối chiếu mục tiêu, thảo luận kết quả, xác định hạn chế
+Kết luận và hướng phát triển
+5. Đóng góp chính của đồ án
+Mô hình hóa rõ chuỗi dữ liệu nhân viên - phân ca - chấm công - nghỉ phép - bảng lương - dashboard.
+Bổ sung cơ chế dữ liệu có hiệu lực theo thời gian cho lương và phân ca, đồng thời lưu snapshot khi tính lương.
+Đề xuất quy tắc kiểm soát chỉnh sửa sau khóa lương, phân biệt mở lại kỳ và điều chỉnh ở kỳ sau.
+Xây dựng rule engine cảnh báo có khả năng giải thích và liên kết trực tiếp tới bản ghi nguồn.
+Tạo ma trận truy vết từ yêu cầu tới use case, mô-đun, thực thể và test case để tăng tính kiểm chứng.
+6. Cấu trúc báo cáo
+Báo cáo gồm phần mở đầu, năm chương, kết luận và hướng phát triển, tài liệu tham khảo và phụ lục. Chương 1 trình bày bối cảnh, quy trình hiện tại, bên liên quan và bài toán kỹ thuật. Chương 2 hệ thống hóa cơ sở lý thuyết và công nghệ. Chương 3 là trọng tâm phân tích - thiết kế, gồm use case, kiến trúc, biểu đồ lớp, ERD, lược đồ dữ liệu và chuỗi xử lý công - phép - lương - dashboard. Chương 4 mô tả xây dựng, ví dụ dữ liệu, giao diện, log và triển khai. Chương 5 trình bày chiến lược, test case, số liệu, đánh giá, thảo luận và hạn chế.
+CHƯƠNG 1. TỔNG QUAN BÀI TOÁN VÀ ĐỊNH HƯỚNG GIẢI PHÁP
+1.1. Bối cảnh quản trị nhân sự trong doanh nghiệp
+Quản trị nhân sự bao gồm chuỗi hoạt động từ tiếp nhận hồ sơ, bố trí đơn vị công tác, quản lý chức vụ và hợp đồng, phân ca, theo dõi thời gian làm việc, giải quyết nghỉ phép đến tính và chi trả lương. Mỗi hoạt động tạo dữ liệu có quan hệ chặt chẽ. Phòng ban và chức vụ tạo nên cơ cấu tổ chức; phân ca quyết định mốc đúng giờ; bảng công là đầu vào của lương; đơn nghỉ đã duyệt phải loại trừ tình trạng vắng mặt không lý do; bảng lương phải sử dụng mức lương có hiệu lực trong đúng kỳ.
+Trong doanh nghiệp nhỏ, các nghiệp vụ có thể được xử lý bằng bảng tính. Khi số lượng nhân viên, ca, phòng ban và kỳ lương tăng, phương pháp này bộc lộ hạn chế: một thay đổi phải cập nhật nhiều nơi, công thức bị sao chép không nhất quán, quyền truy cập khó kiểm soát và báo cáo thường chỉ được tổng hợp cuối kỳ. Chuyển đổi số trong HRM vì vậy phải hướng đến một nguồn dữ liệu thống nhất và luồng xử lý có trạng thái, không chỉ thay biểu mẫu giấy bằng biểu mẫu điện tử.
+Hình 1. Sơ đồ ngữ cảnh của hệ thống quản lý nhân sự
+1.2. Quy trình nghiệp vụ hiện tại và các điểm nghẽn
+Bảng 3. Các vấn đề của phương pháp quản lý rời rạc
+Vấn đề
+Biểu hiện
+Hệ quả
+Dữ liệu phân tán
+Hồ sơ, công, phép và lương nằm ở nhiều tệp hoặc nhiều máy
+Dễ trùng, khó xác định phiên bản đúng
+Nhập liệu lặp
+Thông tin nhân viên phải sao chép sang nhiều biểu mẫu
+Tốn thời gian, tăng sai số
+Thiếu dữ liệu hiệu lực
+Không lưu rõ lương hoặc ca áp dụng từ ngày nào
+Kỳ lương có thể dùng giá trị sai
+Thiếu kiểm soát trạng thái
+Đơn nghỉ, bảng công và lương được sửa tự do
+Khó xác định thời điểm chốt và trách nhiệm
+Thiếu truy vết
+Không lưu người sửa, dữ liệu trước - sau và lý do
+Đối soát chậm, khó giải trình
+Phân quyền yếu
+Tệp dùng chung không giới hạn tới hàng dữ liệu
+Rò rỉ thông tin nhạy cảm
+Dashboard chậm
+KPI tổng hợp thủ công cuối tháng
+Không phát hiện sớm bất thường
+Điểm nghẽn nghiêm trọng nhất là mất tính nhất quán giữa các nguồn. Ví dụ, đơn nghỉ đã được duyệt nhưng bảng công vẫn ghi vắng mặt; nhân viên đã đổi ca nhưng hệ thống đối chiếu với ca cũ; lương cơ bản thay đổi giữa tháng nhưng bảng lương không biết dùng giá trị nào; hoặc bản ghi công được sửa sau khi lương đã thanh toán. Các lỗi thường chỉ được phát hiện ở bước đối soát, khi chi phí sửa và rủi ro tranh chấp đã tăng.
+1.3. Các bên liên quan và nhu cầu
+Bảng 4. Các bên liên quan của hệ thống
+Bên liên quan
+Nhu cầu chính
+Dữ liệu được phép tiếp cận
+Ban lãnh đạo
+KPI, cơ cấu, quỹ lương, xu hướng và cảnh báo
+Dữ liệu tổng hợp toàn doanh nghiệp
+Phòng nhân sự / Quản trị viên
+Quản lý hồ sơ, công, phép, lương, cấu hình và tài khoản
+Toàn bộ dữ liệu nghiệp vụ theo thẩm quyền
+Quản lý phòng ban
+Theo dõi nhân sự, duyệt đơn, xử lý bất thường
+Dữ liệu trong phòng ban được giao
+Nhân viên
+Xem hồ sơ, công, phép và phiếu lương cá nhân
+Dữ liệu cá nhân
+Bộ phận CNTT
+Triển khai, sao lưu, log kỹ thuật, bảo trì
+Cấu hình và log; không mặc định xem lương chi tiết
+1.4. Bài toán kỹ thuật trung tâm
+Bài toán thứ nhất là tính toán thời gian. Ca làm việc có giờ bắt đầu, giờ kết thúc, thời gian nghỉ và khoảng linh hoạt; một số ca kết thúc vào ngày hôm sau. Hệ thống phải quy đổi thời gian về phút, xác định mốc ngày chính xác, xử lý check-in/check-out thiếu hoặc sai thứ tự, và phân biệt đi muộn, về sớm, tăng ca, nghỉ hợp lệ và vắng mặt.
+Bài toán thứ hai là dữ liệu thay đổi theo thời gian. Một nhân viên có thể đổi phòng ban, chức vụ, ca hoặc mức lương. Nếu chỉ lưu giá trị hiện tại trong hồ sơ nhân viên, hệ thống không thể tái tạo chính xác bảng công và bảng lương cũ. Vì vậy, thiết kế cần dữ liệu có hiệu lực từ ngày - đến ngày hoặc snapshot tại thời điểm tính lương.
+Bài toán thứ ba là kiểm soát trạng thái và đồng thời. Đơn nghỉ chỉ tác động khi đã duyệt; bảng lương phải có vòng đời từ mở kỳ, tính, kiểm tra, khóa đến thanh toán; thay đổi sau khóa phải được chặn hoặc chuyển thành quy trình điều chỉnh. Các nghiệp vụ nhiều bảng cần transaction để tránh cập nhật nửa chừng. PostgreSQL cung cấp MVCC và các mức cô lập giao dịch để ứng dụng quản lý truy cập đồng thời [15].
+Bài toán thứ tư là tổng hợp dashboard. Các KPI phải có định nghĩa về tử số, mẫu số, thời gian và phạm vi. Hệ thống cần trả kết quả nhanh nhưng không làm sai lệch dữ liệu. Trong phạm vi đồ án, dashboard được thiết kế gần thời gian thực theo truy vấn kết hợp cache ngắn và bảng tổng hợp kỳ; không sử dụng streaming.
+Hình 2. Luồng dữ liệu cốt lõi nhân viên - chấm công - nghỉ phép - bảng lương - dashboard
+1.5. Định hướng giải pháp
+Giải pháp được triển khai dưới dạng ứng dụng web phân tầng. Lớp trình bày cung cấp giao diện responsive; lớp ứng dụng tiếp nhận yêu cầu và validation; lớp nghiệp vụ thực thi quy tắc; lớp truy cập dữ liệu sử dụng ORM và transaction; PostgreSQL lưu dữ liệu quan hệ; dashboard và rule engine đọc dữ liệu nghiệp vụ để tạo KPI và cảnh báo. Cách tổ chức này phù hợp nguyên tắc tách trách nhiệm và dễ kiểm thử [1], [2].
+Hệ thống ưu tiên quy tắc có thể giải thích. Mỗi kết quả tính công phải chỉ ra ca chuẩn, giờ thực tế, phút đi muộn, thời gian nghỉ và tăng ca. Mỗi cảnh báo phải liên kết tới bản ghi nguồn, nêu điều kiện kích hoạt, mức độ và trạng thái xử lý. Mỗi thay đổi nhạy cảm phải tạo audit log chứa người thực hiện, thời điểm, đối tượng và dữ liệu trước - sau, nhưng loại bỏ mật khẩu, token và bí mật [12].
+1.6. Tiêu chí đánh giá thành công
+Bảng 5. Tiêu chí đánh giá đề tài
+Nhóm tiêu chí
+Chỉ báo
+Cách kiểm chứng
+Đầy đủ chức năng
+Bảy nhóm nghiệp vụ cốt lõi hoạt động
+Đối chiếu yêu cầu - use case - test case
+Tính đúng đắn
+Công thức công và lương cho kết quả xác định
+Kiểm thử giá trị biên và bảng tính độc lập
+Nhất quán dữ liệu
+Không cập nhật nửa chừng, không trùng kỳ
+Ràng buộc, transaction, khóa duy nhất
+Bảo mật
+Không truy cập chéo vai trò/phòng ban
+Kiểm thử API và thay đổi tham số trực tiếp
+Truy vết
+Thao tác quan trọng có log trước - sau
+Tra cứu nhật ký theo đối tượng và người dùng
+Hiệu năng
+Phần lớn thao tác dưới 2 giây ở dữ liệu mẫu
+Đo lặp và ghi nhận trung bình/P95
+Khả dụng
+Giao diện rõ, lỗi dễ hiểu, thao tác hợp lý
+Checklist khả dụng và thử nghiệm nội bộ
+Mở rộng
+Có thể thêm chi nhánh, thiết bị và analytics
+Đánh giá kiến trúc và dữ liệu
+1.7. Kết luận chương
+Chương 1 đã làm rõ bối cảnh, điểm nghẽn, bên liên quan, các bài toán thời gian, dữ liệu hiệu lực, trạng thái, transaction và dashboard. Những nội dung này định hướng phần cơ sở lý thuyết và thiết kế, đồng thời xác định chuỗi công - phép - lương - dashboard là trọng tâm kỹ thuật của đồ án.
+CHƯƠNG 2. CƠ SỞ LÝ THUYẾT VÀ CÔNG NGHỆ SỬ DỤNG
+2.1. Hệ thống quản lý nguồn nhân lực và phân loại dữ liệu
+Hệ thống quản lý nguồn nhân lực tổ chức dữ liệu và tự động hóa quy trình liên quan tới người lao động. Trong đề tài, dữ liệu được chia thành ba nhóm. Master data gồm phòng ban, chức vụ, ca, loại nghỉ, nhân viên, lịch sử lương và phân ca; transactional data gồm chấm công, đơn nghỉ, kỳ lương, bảng lương và điều chỉnh; analytics/log gồm cảnh báo, nhật ký và dữ liệu cache/tổng hợp. Việc phân loại giúp xác định vòng đời, tần suất thay đổi và chiến lược lưu trữ.
+Dữ liệu nhân viên không nên bị xóa cứng khi nghỉ việc vì còn được tham chiếu bởi công, phép và lương. Hệ thống sử dụng trạng thái hoạt động, ngày nghỉ việc và thời gian hiệu lực. Với thông tin biến đổi như lương và phân ca, một bảng lịch sử riêng tốt hơn việc ghi đè trên hồ sơ hiện tại, vì nó cho phép tái tạo dữ liệu theo thời điểm.
+2.2. Cơ sở lý thuyết về chấm công
+Chấm công ghi nhận thời điểm bắt đầu và kết thúc làm việc theo ca. Để tránh sai số số thực, các phép tính thời gian dùng phút nguyên. Với ca không qua ngày, mốc bắt đầu và kết thúc thuộc cùng ngày; với ca qua ngày, mốc kết thúc được cộng một ngày. Quy tắc phải xác định rõ thứ tự ưu tiên trạng thái để tránh một bản ghi đồng thời bị coi là nghỉ phép và vắng mặt.
+Bảng 6. Công thức và quy tắc chấm công cơ bản
+Đại lượng
+Công thức/Quy tắc
+Giải thích
+LateMinutes
+max(0, CheckIn - ShiftStart - GraceMinutes)
+Số phút đi muộn sau thời gian cho phép
+WorkMinutes
+max(0, CheckOut - CheckIn - BreakMinutes)
+Phút làm thực tế sau khi trừ nghỉ
+OvertimeMinutes
+max(0, CheckOut - ShiftEnd)
+Phút vượt giờ kết thúc ca; còn phụ thuộc chính sách
+MissingCheckout
+CheckIn khác rỗng và CheckOut rỗng sau thời hạn
+Không tự ước lượng giờ công
+Absent
+Không có check-in/out và không có nghỉ đã duyệt
+Vắng mặt không có dữ liệu hợp lệ
+ApprovedLeave
+Có đơn đã duyệt bao phủ ngày làm việc
+Ưu tiên hơn Absent
+Các tình huống biên gồm check-in đúng bằng thời gian cho phép, check-out nhỏ hơn check-in, nhiều bản ghi cùng nhân viên - ngày - ca, ca qua ngày, ngày lễ và thay đổi ca. Bảng quyết định và kiểm thử giá trị biên phù hợp với nhóm quy tắc này [5], [6].
+2.3. Quản lý nghỉ phép và chuyển trạng thái
+Đơn nghỉ là đối tượng có vòng đời. Trạng thái cơ bản gồm Nháp, Chờ duyệt, Đã duyệt, Từ chối và Đã hủy. Mỗi chuyển trạng thái có điều kiện, quyền thực hiện và hiệu ứng phụ. Ví dụ, chỉ đơn Chờ duyệt mới được duyệt; khi duyệt phải ghi người duyệt, thời điểm, ghi chú, cập nhật bảng công hoặc tạo cảnh báo xung đột; đơn đã duyệt không được xóa cứng.
+Kiểm tra hợp lệ gồm ngày bắt đầu không sau ngày kết thúc, không trùng đơn đã duyệt khác, nhân viên còn hoạt động, loại nghỉ tồn tại và số dư phép đủ nếu doanh nghiệp quản lý số dư. Số ngày nghỉ phải dựa trên lịch làm việc, loại trừ ngày nghỉ cuối tuần hoặc ngày lễ theo cấu hình.
+2.4. Cơ sở tính lương và tính bất biến của kỳ lương
+Bảng lương tổng hợp nhiều nguồn: lương hiệu lực, ngày công chuẩn, ngày công quy đổi, tăng ca, phụ cấp, thưởng, bảo hiểm, thuế và khấu trừ. Trong phạm vi đồ án, công thức được tham số hóa và trình bày ở mức minh họa. Tiền tệ dùng kiểu decimal và có quy tắc làm tròn nhất quán.
+Bảng 7. Thành phần tính lương
+Thành phần
+Cách xác định
+Lương theo công
+Lương cơ bản hiệu lực / ngày công chuẩn × ngày công quy đổi
+Tăng ca
+Số giờ tăng ca × đơn giá giờ × hệ số cấu hình
+Thu nhập khác
+Tổng phụ cấp và thưởng hợp lệ trong kỳ
+Gross
+Lương theo công + tăng ca + thu nhập khác
+Khấu trừ
+Bảo hiểm + thuế + khoản giảm trừ khác
+Net
+Gross - tổng khấu trừ
+Để bảo toàn lịch sử, bảng lương lưu snapshot các đầu vào quan trọng và có phiên bản. Trước khi khóa, có thể tính lại; sau khi khóa, thay đổi công/phép phải yêu cầu mở lại kỳ có quyền và ghi log; sau khi thanh toán, không sửa bản ghi đã trả mà tạo khoản điều chỉnh ở kỳ sau. Đây là nguyên tắc bất biến cần thiết cho dữ liệu tài chính.
+2.5. Dashboard, KPI và mức độ tươi mới của dữ liệu
+KPI chỉ có ý nghĩa khi định nghĩa rõ phạm vi. Tỷ lệ đúng giờ trong tháng bằng số bản ghi đúng giờ chia tổng bản ghi đủ điều kiện, loại trừ nghỉ đã duyệt và bản ghi chưa hoàn chỉnh. Quỹ lương phải xác định dùng Gross hay Net, trạng thái kỳ nào và phòng ban nào. Biểu đồ cơ cấu dùng dữ liệu nhân viên hoạt động tại thời điểm lọc; xu hướng lương dùng dữ liệu kỳ đã khóa hoặc đã thanh toán.
+Dashboard thời gian thực có thể được xây dựng bằng streaming, nhưng chi phí và độ phức tạp cao. Đồ án sử dụng truy vấn tại thời điểm yêu cầu, chỉ mục, tổng hợp theo nhóm, cache ngắn 30-60 giây và bảng tổng hợp kỳ. Vì vậy, dữ liệu vận hành được xem là gần thời gian thực; sau cập nhật quan trọng, cache liên quan được vô hiệu để giảm độ trễ.
+2.6. Phát hiện bất thường dựa trên luật
+Phương pháp rule-based kiểm tra dữ liệu theo các điều kiện định trước. Ưu điểm là dễ giải thích, kiểm thử và điều chỉnh khi chính sách rõ ràng nhưng dữ liệu lịch sử chưa đủ lớn. Mỗi luật gồm mã, điều kiện, phạm vi, mức độ, thông điệp, khóa chống trùng và hướng xử lý. Cảnh báo không tự kết luận vi phạm; nó hỗ trợ người quản trị ưu tiên kiểm tra.
+Các luật của đề tài gồm thiếu check-out sau ca, đi muộn vượt ngưỡng, giờ làm không hợp lệ, tần suất đi muộn tăng, bản ghi bị sửa nhiều lần và thay đổi dữ liệu ảnh hưởng kỳ lương. Rule engine phải nhận ngữ cảnh ca, đơn nghỉ, trạng thái kỳ lương và lịch sử cảnh báo để giảm cảnh báo sai.
+2.7. Kiến trúc phân tầng, transaction và chỉ mục
+Kiến trúc phân tầng tách giao diện, ứng dụng, nghiệp vụ và dữ liệu. Việc tách lớp tạo khả năng thay đổi UI hoặc ORM mà ít ảnh hưởng quy tắc nghiệp vụ, đồng thời cho phép kiểm thử hàm tính toán độc lập [1], [3]. Các nghiệp vụ như phê duyệt đơn kèm cập nhật công và log phải chạy trong một transaction; nếu một bước thất bại, toàn bộ thay đổi được hoàn tác. Prisma hỗ trợ transaction tuần tự hoặc tương tác cho nhóm thao tác cần tính nguyên tử [17].
+Chỉ mục giúp PostgreSQL tìm hàng nhanh hơn nhưng làm tăng chi phí ghi và dung lượng, do đó phải dựa trên mẫu truy vấn [16]. Các chỉ mục quan trọng gồm Employee(code), Attendance(employeeId, workDate), LeaveRequest(employeeId, fromDate, toDate, status), Payroll(employeeId, periodId) và ActivityLog(createdAt, entity). Ràng buộc duy nhất cần ngăn trùng công và trùng bảng lương.
+2.8. Xác thực, quản lý phiên, RBAC và nhật ký
+Xác thực xác định người dùng là ai; phân quyền xác định người đó được làm gì. RBAC gán quyền cho vai trò thay vì từng người dùng, giúp quản lý quyền nhất quán [7], [8]. Tuy nhiên, ngoài quyền theo chức năng còn phải kiểm tra phạm vi dữ liệu: quản lý phòng ban chỉ được xem hoặc duyệt đối tượng thuộc phòng ban của mình. Kiểm tra phải thực hiện phía máy chủ, không chỉ ẩn nút giao diện [11].
+Phiên đăng nhập cần dùng ID khó đoán, cookie HttpOnly, Secure trong HTTPS, SameSite phù hợp, thời hạn và cơ chế hủy/rotate [9], [10]. Các sự kiện đăng nhập thất bại, thay đổi quyền, sửa công, duyệt phép, khóa lương và truy cập bị từ chối cần được log. Log không lưu mật khẩu, token hoặc thông tin nhạy cảm không cần thiết [12].
+2.9. Công nghệ sử dụng
+Bảng 8. Lý do lựa chọn công nghệ triển khai
+Công nghệ
+Vai trò
+Lý do lựa chọn
+Next.js + TypeScript
+UI, route, Server Component/Function, API
+Tổ chức full-stack thống nhất, kiểu dữ liệu rõ và hỗ trợ App Router [13], [14]
+PostgreSQL
+Cơ sở dữ liệu quan hệ
+Ràng buộc, transaction, MVCC và truy vấn tổng hợp tốt [15], [16]
+Prisma ORM
+Schema, migration, truy vấn và transaction
+Kiểu an toàn, quan hệ rõ, hỗ trợ nested writes và transaction [17], [18]
+Tailwind CSS / Component UI
+Bố cục, form, bảng, responsive
+Tái sử dụng thành phần và thống nhất giao diện
+Thư viện biểu đồ React
+KPI, donut, bar, trend
+Tích hợp trực tiếp dữ liệu dashboard
+Docker + Nginx
+Đóng gói, HTTPS, reverse proxy
+Đồng nhất môi trường và tách lớp triển khai
+Unit / Integration / E2E test
+Kiểm thử nghiệp vụ và luồng người dùng
+Kết hợp nhiều mức kiểm thử theo rủi ro [5]
+Hình 3. Kiến trúc công nghệ phân tầng đề xuất
+2.10. Kết luận chương
+Chương 2 đã trình bày nền tảng về phân loại dữ liệu HRM, tính công, nghỉ phép, bảng lương, dashboard, luật bất thường, transaction, chỉ mục, xác thực, RBAC và công nghệ. Các nguyên tắc về dữ liệu hiệu lực, snapshot, bất biến sau thanh toán và kiểm tra quyền phía máy chủ là cơ sở trực tiếp cho thiết kế ở Chương 3.
+CHƯƠNG 3. PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG
+3.1. Mối liên hệ giữa yêu cầu, use case, kiến trúc và dữ liệu
+Chương này chuyển nhu cầu nghiệp vụ thành thiết kế có thể triển khai và kiểm thử. Yêu cầu chức năng xác định hệ thống phải làm gì; use case mô tả mục tiêu và tương tác của người dùng; kiến trúc phân chia trách nhiệm giữa các thành phần; mô hình dữ liệu bảo đảm thông tin được lưu đúng, không trùng và có thể truy vết. Mỗi use case cốt lõi được liên kết tới mô-đun, thực thể và test case trong ma trận truy vết, giúp hạn chế tình trạng mô hình hóa rời rạc.
+Để tránh mất cân đối, các CRUD đơn giản được mô tả ở mức tóm tắt, trong khi phần chi tiết tập trung vào chấm công, nghỉ phép, bảng lương, khóa kỳ, dashboard, cảnh báo và phân quyền. Đây là các luồng có nhiều trạng thái, ràng buộc thời gian và tác động chéo dữ liệu.
+3.2. Phân tích yêu cầu chức năng
+Bảng 9. Danh sách yêu cầu chức năng đã chuẩn hóa
+Mã
+Nhóm
+Yêu cầu
+Ưu tiên
+FR-01
+Danh mục
+Quản lý phòng ban
+Bắt buộc
+FR-02
+Danh mục
+Quản lý chức vụ và khung lương
+Bắt buộc
+FR-03
+Danh mục
+Quản lý ca làm việc
+Bắt buộc
+FR-04
+Danh mục
+Quản lý loại hợp đồng, nghỉ phép và tham số
+Bắt buộc
+FR-05
+Nhân sự
+Thêm, cập nhật, vô hiệu hóa hồ sơ
+Bắt buộc
+FR-06
+Nhân sự
+Tra cứu, lọc, phân trang và xem chi tiết
+Bắt buộc
+FR-07
+Nhân sự
+Quản lý lịch sử lương và phân ca
+Bắt buộc
+FR-08
+Chấm công
+Tạo/cập nhật bản ghi đơn lẻ
+Bắt buộc
+FR-09
+Chấm công
+Nhập hoặc tạo dữ liệu hàng loạt
+Bắt buộc
+FR-10
+Chấm công
+Tính trạng thái, phút công, đi muộn và tăng ca
+Bắt buộc
+FR-11
+Chấm công
+Kiểm soát chỉnh sửa theo kỳ lương
+Bắt buộc
+FR-12
+Nghỉ phép
+Tạo, hủy và tra cứu đơn
+Bắt buộc
+FR-13
+Nghỉ phép
+Duyệt/từ chối trong phạm vi quyền
+Bắt buộc
+FR-14
+Nghỉ phép
+Đồng bộ đơn đã duyệt với bảng công
+Bắt buộc
+FR-15
+Bảng lương
+Khởi tạo kỳ và tổng hợp dữ liệu
+Bắt buộc
+FR-16
+Bảng lương
+Tính Gross/Net và lưu snapshot
+Bắt buộc
+FR-17
+Bảng lương
+Quản lý điều chỉnh, phiên bản và trạng thái
+Bắt buộc
+FR-18
+Bảng lương
+Khóa, mở lại có quyền và thanh toán
+Bắt buộc
+FR-19
+Dashboard
+KPI và biểu đồ theo bộ lọc
+Bắt buộc
+FR-20
+Dashboard
+Lịch nghỉ, sinh nhật, log và cảnh báo
+Bắt buộc
+FR-21
+Cảnh báo
+Sinh, chống trùng, xử lý và đóng cảnh báo
+Bắt buộc
+FR-22
+Xác thực
+Đăng nhập, đăng xuất và quản lý phiên
+Bắt buộc
+FR-23
+Phân quyền
+RBAC và giới hạn phạm vi dữ liệu
+Bắt buộc
+FR-24
+Nhật ký
+Lưu và tra cứu audit log
+Bắt buộc
+FR-25
+Báo cáo
+Xuất dữ liệu theo bộ lọc
+Bắt buộc
+FR-26
+Quản trị
+Quản lý tài khoản, vai trò và cấu hình
+Bắt buộc
+3.3. Yêu cầu phi chức năng
+Bảng 10. Yêu cầu phi chức năng và tiêu chí chấp nhận
+Mã
+Nhóm
+Mô tả
+Tiêu chí chấp nhận
+NFR-01
+Hiệu năng
+Danh sách và dashboard phản hồi ổn định
+Phần lớn thao tác < 2 giây ở dữ liệu mẫu; truy vấn xuất có thể lâu hơn
+NFR-02
+Bảo mật
+Mật khẩu băm, cookie an toàn, kiểm tra quyền server
+Không truy cập chéo vai trò hoặc phòng ban
+NFR-03
+Tin cậy
+Transaction cho thao tác nhiều bảng
+Không tồn tại trạng thái cập nhật nửa chừng
+NFR-04
+Toàn vẹn
+Khóa ngoại, duy nhất và dữ liệu hiệu lực
+Không trùng công/lương; tái tạo được dữ liệu theo kỳ
+NFR-05
+Truy vết
+Log thao tác nhạy cảm và thay đổi trước - sau
+Xác định được ai, khi nào, đối tượng và lý do
+NFR-06
+Khả dụng
+Responsive, thông báo rõ, trạng thái tải
+Tác vụ chính hoàn thành theo luồng nhất quán
+NFR-07
+Bảo trì
+Tách lớp, kiểu dữ liệu và module
+Bổ sung chức năng không sửa lan rộng
+NFR-08
+Sao lưu
+Sao lưu định kỳ và thử phục hồi
+Có quy trình backup/restore được kiểm chứng
+NFR-09
+Riêng tư
+Giới hạn dữ liệu nhạy cảm và log
+Không ghi password/token; lương chỉ hiện theo quyền
+3.4. Tác nhân và mô hình phân quyền
+Hệ thống có hai nhóm tác nhân chính: Quản trị viên và Nhân viên. Quản lý phòng ban là vai trò chuyên biệt của Nhân viên, kế thừa quyền tự phục vụ và có thêm quyền xem, duyệt hoặc xử lý trong phạm vi phòng ban. Cách mô hình hóa này giữ sơ đồ use case gọn nhưng vẫn phản ánh đúng phân quyền thực tế.
+Bảng 11. Ma trận quyền theo vai trò và phạm vi
+Chức năng
+Quản trị viên
+Quản lý phòng ban
+Nhân viên
+Danh mục
+Toàn quyền
+Chỉ xem nếu được cấp
+Không
+Hồ sơ nhân viên
+Toàn doanh nghiệp
+Xem trong phòng
+Xem cá nhân
+Chấm công
+Tạo/sửa toàn phạm vi
+Xem/sửa trong phòng theo quyền
+Xem cá nhân
+Nghỉ phép
+Duyệt toàn phạm vi
+Duyệt trong phòng
+Tạo/hủy/xem cá nhân
+Bảng lương
+Tính, điều chỉnh, khóa
+Chỉ xem tổng hợp nếu được cấp
+Xem phiếu lương cá nhân
+Dashboard
+Toàn doanh nghiệp
+Theo phòng ban
+Chỉ số cá nhân
+Cảnh báo
+Tạo/xử lý/cấu hình
+Xử lý trong phòng
+Không
+Tài khoản và log
+Toàn quyền
+Không
+Không
+Hình 4. Sơ đồ use case tổng quát và quan hệ giữa các tác nhân
+3.5. Mô hình use case
+3.5.1. Danh sách 26 use case
+Bảng 12. Danh sách use case và tác nhân
+Mã
+Tên use case
+Tác nhân chính
+UC-01
+Đăng nhập
+Quản trị viên, Nhân viên
+UC-02
+Đăng xuất
+Mọi người dùng
+UC-03
+Quản lý phòng ban
+Quản trị viên
+UC-04
+Quản lý chức vụ
+Quản trị viên
+UC-05
+Quản lý ca làm việc
+Quản trị viên
+UC-06
+Quản lý master data
+Quản trị viên
+UC-07
+Thêm nhân viên
+Quản trị viên
+UC-08
+Cập nhật/vô hiệu hóa nhân viên
+Quản trị viên
+UC-09
+Tra cứu hồ sơ nhân viên
+Theo phạm vi vai trò
+UC-10
+Cập nhật chấm công đơn lẻ
+Quản trị viên, Quản lý
+UC-11
+Nhập chấm công hàng loạt
+Quản trị viên
+UC-12
+Xem bảng công cá nhân
+Nhân viên
+UC-13
+Tạo đơn nghỉ
+Nhân viên
+UC-14
+Hủy đơn nghỉ chờ duyệt
+Nhân viên, Quản trị viên
+UC-15
+Duyệt/từ chối đơn nghỉ
+Quản trị viên, Quản lý
+UC-16
+Đồng bộ nghỉ phép với bảng công
+Hệ thống, Quản trị viên
+UC-17
+Khởi tạo kỳ lương
+Quản trị viên
+UC-18
+Tính bảng lương
+Quản trị viên
+UC-19
+Điều chỉnh bảng lương
+Quản trị viên
+UC-20
+Khóa/mở lại kỳ lương
+Quản trị viên có quyền
+UC-21
+Xem phiếu lương
+Nhân viên
+UC-22
+Xem dashboard
+Theo phạm vi vai trò
+UC-23
+Xử lý cảnh báo
+Quản trị viên, Quản lý
+UC-24
+Tra cứu nhật ký
+Quản trị viên
+UC-25
+Xuất báo cáo
+Theo quyền
+UC-26
+Quản trị tài khoản và phân quyền
+Quản trị viên
+3.5.2. Đặc tả các use case cốt lõi
+Bảng 13. Đặc tả UC-10 - Cập nhật chấm công đơn lẻ
+Thuộc tính
+Nội dung
+Điều kiện trước
+Người dùng có quyền; nhân viên, phân ca và ngày làm việc tồn tại; kỳ lương chưa khóa.
+Luồng chính
+Chọn nhân viên và ngày; hệ thống lấy ca hiệu lực; nhập check-in/out; chuẩn hóa mốc thời gian; kiểm tra đơn nghỉ; tính trạng thái và phút; lưu Attendance, cảnh báo và log trong transaction.
+Luồng thay thế/ngoại lệ
+Dữ liệu trùng; check-out sai thứ tự; thiếu check-out; có nghỉ đã duyệt; kỳ lương đã khóa.
+Kết quả sau
+Bản ghi công nhất quán, có audit log; cảnh báo được sinh hoặc cập nhật.
+Bảng 14. Đặc tả UC-15 - Duyệt/từ chối đơn nghỉ
+Thuộc tính
+Nội dung
+Điều kiện trước
+Đơn ở trạng thái Chờ duyệt; người duyệt có quyền và đúng phạm vi.
+Luồng chính
+Mở chi tiết; kiểm tra trùng/số dư; chọn duyệt hoặc từ chối; nhập ghi chú; cập nhật trạng thái, người duyệt, thời điểm; tạo thông báo và log.
+Luồng thay thế/ngoại lệ
+Đơn đã được người khác xử lý; nhân viên đổi phòng; kỳ công đã khóa; xung đột với check-in/out.
+Kết quả sau
+Đơn có trạng thái cuối; nếu duyệt thì kích hoạt UC-16.
+Bảng 15. Đặc tả UC-16 - Đồng bộ nghỉ phép với bảng công
+Thuộc tính
+Nội dung
+Điều kiện trước
+Đơn đã duyệt; có lịch làm việc trong khoảng nghỉ.
+Luồng chính
+Duyệt từng ngày làm việc; nếu chưa có công thì tạo Attendance trạng thái LEAVE_APPROVED; nếu đang Absent thì cập nhật; nếu có check-in/out thì tạo cảnh báo xung đột, không ghi đè tự động.
+Luồng thay thế/ngoại lệ
+Ngày thuộc kỳ lương đã khóa; ca chưa được cấu hình; tồn tại dữ liệu thực tế.
+Kết quả sau
+Bảng công và lịch nghỉ đồng bộ hoặc có cảnh báo cần xử lý.
+Bảng 16. Đặc tả UC-18 - Tính bảng lương
+Thuộc tính
+Nội dung
+Điều kiện trước
+Kỳ lương tồn tại ở trạng thái Mở/Đã tính; dữ liệu công đủ điều kiện.
+Luồng chính
+Lấy nhân viên hoạt động trong kỳ; chọn lương và phân ca hiệu lực; tổng hợp công; lưu snapshot; áp dụng phụ cấp/khấu trừ; tính Gross/Net; tăng version khi tính lại.
+Luồng thay thế/ngoại lệ
+Thiếu công; lương không có hiệu lực; Net âm; bản ghi trùng.
+Kết quả sau
+Tạo hoặc cập nhật Payroll nháp, có chi tiết giải thích.
+Bảng 17. Đặc tả UC-20 - Khóa/mở lại kỳ lương
+Thuộc tính
+Nội dung
+Điều kiện trước
+Người dùng có quyền đặc biệt; kỳ đã kiểm tra.
+Luồng chính
+Kiểm tra công thiếu, Net âm, cảnh báo chưa xử lý; xác nhận khóa; ghi lockedAt/lockedBy và log. Khi mở lại, yêu cầu lý do, tăng version và ghi log.
+Luồng thay thế/ngoại lệ
+Kỳ đã thanh toán; có giao dịch đồng thời; thiếu quyền.
+Kết quả sau
+Kỳ chuyển trạng thái hợp lệ; dữ liệu chịu quy tắc bất biến.
+Bảng 18. Đặc tả UC-22 - Xem dashboard
+Thuộc tính
+Nội dung
+Điều kiện trước
+Người dùng đã đăng nhập và có phạm vi dữ liệu.
+Luồng chính
+Chọn thời gian/phòng ban; hệ thống kiểm tra quyền; đọc cache hoặc truy vấn tổng hợp; trả KPI, biểu đồ, lịch và cảnh báo; cho phép drill-down.
+Luồng thay thế/ngoại lệ
+Bộ lọc ngoài phạm vi; dữ liệu chưa có; truy vấn lỗi.
+Kết quả sau
+Dashboard hiển thị dữ liệu cùng phạm vi và thời điểm.
+Bảng 19. Đặc tả UC-23 - Xử lý cảnh báo
+Thuộc tính
+Nội dung
+Điều kiện trước
+Cảnh báo tồn tại và chưa xử lý; người dùng có quyền phạm vi.
+Luồng chính
+Mở cảnh báo; xem bản ghi nguồn và lý do; sửa dữ liệu nếu được phép hoặc ghi chú; đánh dấu đã xử lý; lưu resolvedBy/resolvedAt và log.
+Luồng thay thế/ngoại lệ
+Kỳ lương khóa; cảnh báo đã được người khác xử lý; bản ghi nguồn không còn.
+Kết quả sau
+Cảnh báo đóng hoặc chuyển trạng thái cần phê duyệt.
+Bảng 20. Đặc tả UC-26 - Quản trị tài khoản và phân quyền
+Thuộc tính
+Nội dung
+Điều kiện trước
+Quản trị viên có quyền quản lý tài khoản.
+Luồng chính
+Tạo/gắn tài khoản; gán vai trò; kích hoạt/vô hiệu hóa; thay đổi quyền; hủy phiên đang hoạt động; ghi log.
+Luồng thay thế/ngoại lệ
+Username trùng; tự hạ quyền tài khoản cuối cùng; gán phạm vi không hợp lệ.
+Kết quả sau
+Tài khoản và phiên phản ánh quyền mới; thay đổi có log.
+3.5.3. Ma trận truy vết yêu cầu - use case - mô-đun - kiểm thử
+Bảng 21. Ma trận truy vết các luồng cốt lõi
+Yêu cầu
+Use case
+Mô-đun/Thực thể
+Test case tiêu biểu
+FR-08..11
+UC-10, UC-11, UC-12
+Attendance, ShiftAssignment, Alert
+TC-A01..TC-A10
+FR-12..14
+UC-13..UC-16
+LeaveRequest, Attendance, ActivityLog
+TC-L01..TC-L08
+FR-15..18
+UC-17..UC-21
+PayrollPeriod, Payroll, SalaryHistory
+TC-P01..TC-P10
+FR-19..21
+UC-22, UC-23
+Dashboard query, Alert, Cache
+TC-D01..TC-D06
+FR-22..24, FR-26
+UC-01, UC-02, UC-24, UC-26
+User, Session, RBAC, ActivityLog
+TC-S01..TC-S12
+FR-25
+UC-25
+Export service
+TC-E01..TC-E03
+3.6. Thiết kế kiến trúc tổng thể
+Kiến trúc gồm lớp trình bày, lớp ứng dụng, lớp nghiệp vụ, dashboard/rule engine, lớp truy cập dữ liệu và PostgreSQL. Next.js App Router tổ chức route, layout, Server Component và xử lý dữ liệu [13]. Các thao tác thay đổi dữ liệu được thực hiện qua Server Function/Route Handler, nhưng mọi đầu vào vẫn phải validation và kiểm tra quyền phía máy chủ [14].
+Hình 5. Mô hình kiến trúc phân tầng của hệ thống
+Lớp nghiệp vụ không phụ thuộc trực tiếp vào giao diện. Ví dụ, hàm calculateAttendance nhận bản ghi, ca và đơn nghỉ rồi trả kết quả; AttendanceService kiểm tra quyền, kỳ lương và gọi transaction; giao diện chỉ hiển thị preview và thông báo. Cách tách này cho phép unit test công thức mà không cần trình duyệt.
+3.7. Biểu đồ lớp và mô hình miền
+Hình 6. Biểu đồ lớp miền nghiệp vụ HRM
+Employee liên kết Department và Position, nhưng lương và ca được tách thành SalaryHistory và ShiftAssignment để biểu diễn hiệu lực theo thời gian. Attendance tham chiếu nhân viên và ca áp dụng; LeaveRequest mô tả vòng đời đơn; PayrollPeriod quản lý trạng thái kỳ; Payroll lưu kết quả theo nhân viên và phiên bản; PayrollAdjustment lưu khoản cộng/trừ; ActivityLog và AttendanceAlert phục vụ truy vết và giám sát.
+Các dịch vụ miền chính gồm AttendanceService, LeaveService, PayrollService, DashboardService, AuthorizationService và AuditService. Dịch vụ chịu trách nhiệm quy tắc và transaction; repository/Prisma chịu trách nhiệm truy cập dữ liệu. Không đặt công thức lương trực tiếp trong component giao diện để tránh trùng logic.
+3.8. Thiết kế cơ sở dữ liệu
+3.8.1. Phân loại thực thể
+Hình 7. ERD và phân loại master, transactional, analytics/log data
+Bảng 22. Giải thích các thực thể chính
+Nhóm
+Thực thể
+Vai trò
+Master
+Department, Position, Shift, LeaveType, SystemSetting
+Danh mục dùng chung, thay đổi chậm
+Master theo thời gian
+Employee, SalaryHistory, ShiftAssignment
+Nguồn dữ liệu nhân sự và giá trị có hiệu lực
+Transactional
+Attendance, LeaveRequest
+Dữ liệu phát sinh hằng ngày và luồng phê duyệt
+Transactional tài chính
+PayrollPeriod, Payroll, PayrollAdjustment
+Kỳ lương, snapshot, kết quả và điều chỉnh
+Analytics/Log
+AttendanceAlert, ActivityLog, DashboardCache
+Cảnh báo, truy vết và tối ưu truy vấn
+3.8.2. Ràng buộc và chỉ mục
+Bảng 23. Ràng buộc toàn vẹn dữ liệu
+Bảng
+Ràng buộc chính
+Mục đích
+Employee
+code unique; CCCD unique khi có; status hợp lệ
+Không trùng định danh
+SalaryHistory
+amount >= 0; khoảng hiệu lực không chồng
+Chọn đúng lương theo ngày
+ShiftAssignment
+khoảng hiệu lực không chồng theo nhân viên
+Một ca chính tại một thời điểm
+Attendance
+unique(employeeId, workDate, shiftId); phút >= 0
+Không trùng công và không có số âm
+LeaveRequest
+fromDate <= toDate; status enum
+Bảo đảm khoảng nghỉ và trạng thái
+PayrollPeriod
+unique(month, year, scope); state enum
+Một kỳ theo phạm vi
+Payroll
+unique(employeeId, periodId, version); money decimal
+Hỗ trợ phiên bản và tiền chính xác
+AttendanceAlert
+unique(attendanceId, alertType, activeFlag)
+Chống tạo cảnh báo trùng
+ActivityLog
+append-only; cấm field nhạy cảm
+Bảo toàn lịch sử
+Bảng 24. Chỉ mục dữ liệu đề xuất
+Bảng
+Chỉ mục
+Truy vấn hỗ trợ
+Employee
+code; departmentId + status; fullName search
+Tra cứu và lọc nhân sự
+Attendance
+employeeId + workDate; workDate + status; shiftId
+Bảng công theo người/kỳ/trạng thái
+LeaveRequest
+employeeId + fromDate; status + fromDate
+Kiểm tra trùng và danh sách duyệt
+Payroll
+periodId + employeeId; status
+Kỳ lương và xuất báo cáo
+ActivityLog
+createdAt; actorId; entity + entityId
+Tra cứu sự kiện
+AttendanceAlert
+resolvedAt + severity; createdAt
+Dashboard cảnh báo
+3.8.3. Thiết kế dữ liệu hiệu lực và snapshot
+SalaryHistory và ShiftAssignment dùng effectiveFrom/effectiveTo. Khi truy vấn một ngày D, bản ghi hợp lệ thỏa effectiveFrom ≤ D và (effectiveTo rỗng hoặc D ≤ effectiveTo). Hệ thống phải ngăn các khoảng chồng nhau. Khi tính lương, các đầu vào được sao chép vào PayrollSnapshot hoặc các cột chi tiết của Payroll để kết quả không thay đổi khi master data được sửa sau này.
+ActivityLog lưu beforeData và afterData dạng JSON có kiểm soát. Dữ liệu log chỉ gồm trường cần đối soát; passwordHash, token, secret và thông tin nhạy cảm không phục vụ nghiệp vụ phải bị loại bỏ. Log được coi là append-only: không cho người dùng nghiệp vụ sửa hoặc xóa trực tiếp.
+3.9. Thiết kế chuỗi xử lý chấm công - nghỉ phép - bảng lương - dashboard
+3.9.1. Xử lý chấm công
+Hình 8. Quy trình xác định trạng thái và số phút chấm công
+Bảng 25. Bảng quyết định trạng thái chấm công
+Ưu tiên
+Điều kiện
+Trạng thái
+Hành động
+1
+Có đơn nghỉ đã duyệt bao phủ ngày
+Nghỉ phép
+Không tính vắng; ghi nguồn leaveRequestId
+2
+Không có check-in và check-out
+Vắng mặt
+Tạo cảnh báo nếu ngày làm việc đã kết thúc
+3
+Có check-in, thiếu check-out
+Quên check-out
+Không tính workMinutes; tạo cảnh báo
+4
+Check-out < check-in và không phải ca qua ngày
+Dữ liệu không hợp lệ
+Từ chối lưu
+5
+LateMinutes > 0
+Đi muộn
+Tính mức độ theo ngưỡng
+6
+Dữ liệu đầy đủ trong giới hạn
+Đúng giờ
+Tính workMinutes và overtime
+3.9.2. Đồng bộ đơn nghỉ đã duyệt
+Hình 9. Vòng đời đơn nghỉ và bước đồng bộ với bảng công
+Khi phê duyệt, LeaveService mở transaction, khóa/kiểm tra phiên bản đơn để tránh hai người duyệt đồng thời, cập nhật trạng thái và duyệt từng ngày làm việc. Nếu chưa có Attendance, hệ thống tạo bản ghi LEAVE_APPROVED; nếu đang ABSENT, cập nhật trạng thái; nếu đã có check-in/out, hệ thống không ghi đè mà tạo cảnh báo LEAVE_ATTENDANCE_CONFLICT. Nếu kỳ lương đã khóa, đồng bộ bị chặn và yêu cầu quy trình mở lại kỳ hoặc điều chỉnh.
+3.9.3. Kiểm soát thay đổi sau khi bảng lương đã chốt
+Hình 10. Vòng đời kỳ lương và xử lý thay đổi sau khóa
+Bảng 26. Quy tắc xử lý thay đổi dữ liệu theo trạng thái kỳ lương
+Trạng thái kỳ
+Sửa công/phép
+Tính lại lương
+Cách xử lý
+Mở
+Cho phép theo quyền
+Cho phép
+Ghi log bình thường
+Đã tính/Đang kiểm tra
+Cho phép có cảnh báo
+Tự đánh dấu cần tính lại
+Tăng version khi tính lại
+Đã khóa
+Chặn mặc định
+Không
+Người có quyền mở lại, nhập lý do, ghi log
+Đã thanh toán
+Không sửa dữ liệu nguồn ảnh hưởng kết quả
+Không sửa bản đã trả
+Tạo PayrollAdjustment ở kỳ sau
+Hình 11. Sequence kiểm tra kỳ lương khi yêu cầu sửa chấm công
+3.9.4. Mức độ cập nhật dashboard
+Hình 12. Thiết kế tổng hợp và mức độ tươi mới của dashboard
+KPI vận hành như đơn chờ duyệt, cảnh báo chưa xử lý và tỷ lệ đúng giờ được truy vấn từ dữ liệu hiện hành, có cache ngắn và vô hiệu khi cập nhật quan trọng. Xu hướng quỹ lương nhiều tháng có thể đọc bảng tổng hợp được cập nhật khi khóa kỳ. Mỗi phản hồi dashboard trả thêm generatedAt để người dùng biết thời điểm dữ liệu được tính. Cách thiết kế này minh bạch hơn việc gọi chung là thời gian thực.
+3.10. Thiết kế xác thực và bảo mật
+Hình 13. Sơ đồ trình tự đăng nhập, tạo phiên và kiểm tra quyền
+AuthorizationService cung cấp các hàm requireRole và requireScope. Mọi dịch vụ cập nhật gọi hàm này trước khi truy vấn hoặc thay đổi dữ liệu. Với quản lý phòng ban, điều kiện departmentId được thêm ở phía server; khi đối tượng không thuộc phạm vi, hệ thống trả 403 hoặc 404 có kiểm soát, không để lộ dữ liệu. Việc chỉ ẩn menu không được xem là bảo mật.
+Bảng 27. Các kiểm soát bảo mật chính
+Rủi ro
+Kiểm soát thiết kế
+Mật khẩu bị lộ
+Băm bằng thuật toán thích hợp; không log; chính sách độ dài và khóa tạm
+Đánh cắp phiên
+Cookie HttpOnly, Secure, SameSite; rotate session; hủy khi đăng xuất
+Vượt quyền dọc
+Kiểm tra role/permission ở service
+Vượt quyền ngang
+Kiểm tra ownership/department scope trên từng đối tượng
+Injection
+ORM/parameterized query; validation kiểu và độ dài
+CSRF
+SameSite, kiểm tra origin và cơ chế của Server Action/route
+Rò rỉ lỗi
+Thông báo người dùng chung; log kỹ thuật nội bộ
+Log nhạy cảm
+Danh sách trường cấm và masking
+3.11. Thiết kế giao diện người dùng
+Bảng 28. Nguyên tắc thiết kế giao diện
+Nguyên tắc
+Cách áp dụng
+Nhất quán
+Dùng chung layout, form, nút, trạng thái và thông báo
+Khả năng quan sát
+Có loading, kết quả, lỗi, generatedAt và trạng thái kỳ
+Phòng ngừa lỗi
+Validation sớm; xác nhận thao tác khóa, hủy, vô hiệu hóa
+Khả năng đọc
+Số tiền căn phải; trạng thái có nhãn; bảng có tiêu đề lặp
+Responsive
+Bảng cuộn ngang; bộ lọc co gọn; thao tác chính ưu tiên
+Truy cập nhanh
+Từ KPI/cảnh báo drill-down tới dữ liệu nguồn
+Empty state
+Nêu rõ không có dữ liệu và gợi ý hành động
+3.12. Kết luận chương
+Chương 3 đã chuẩn hóa 26 use case, làm rõ hai nhóm tác nhân chính và vai trò quản lý chuyên biệt, thiết kế kiến trúc phân tầng, biểu đồ lớp, ERD, dữ liệu hiệu lực, ràng buộc, chỉ mục và chuỗi công - phép - lương - dashboard. Quy tắc đồng bộ nghỉ phép, khóa kỳ lương, điều chỉnh sau thanh toán và mức độ gần thời gian thực của dashboard được mô tả rõ, tạo cơ sở cho xây dựng và kiểm thử.
+CHƯƠNG 4. XÂY DỰNG VÀ TRIỂN KHAI HỆ THỐNG
+4.1. Môi trường phát triển và tổ chức mã nguồn
+Bảng 29. Môi trường và công cụ phát triển
+Thành phần
+Lựa chọn
+Vai trò
+Ngôn ngữ
+TypeScript
+Dùng chung kiểu dữ liệu frontend/backend
+Framework
+Next.js App Router
+Trang, layout, route, Server Function/Component
+Giao diện
+Tailwind CSS và component tái sử dụng
+Form, bảng, responsive và trạng thái
+Cơ sở dữ liệu
+PostgreSQL
+Lưu dữ liệu quan hệ và tổng hợp
+ORM
+Prisma
+Schema, migration, transaction và truy vấn
+Biểu đồ
+Thư viện chart cho React
+Donut, bar, trend và KPI
+Kiểm thử
+Unit, integration, E2E
+Xác minh công thức và luồng
+Triển khai
+Docker, Nginx
+Đóng gói, HTTPS và reverse proxy
+Mã nguồn được tổ chức theo miền nghiệp vụ thay vì chỉ theo loại tệp. Mỗi miền gồm schema validation, service, repository/query, component và test. Các enum trạng thái công, đơn, kỳ lương và vai trò được định nghĩa tập trung. Biến môi trường chứa chuỗi kết nối, khóa phiên và cấu hình triển khai, không đưa vào kho mã nguồn.
+src/  app/                 # route, layout, page, server action  modules/    employees/         # schema, service, repository, components, tests    attendance/    leave/    payroll/    dashboard/    auth/  lib/                  # prisma, session, authorization, auditprisma/  schema.prisma  migrations/  seed.ts
+4.2. Xây dựng cơ sở dữ liệu và migration
+Lược đồ được triển khai bằng migration có phiên bản. Cột tiền dùng Decimal; ngày làm việc dùng date; thời điểm sự kiện dùng timestamp; số phút dùng integer; enum hoặc bảng master data dùng cho trạng thái. Các thao tác nhiều bảng chạy trong transaction. Dữ liệu seed gồm vai trò, loại nghỉ, phòng ban, chức vụ, ca hành chính, tham số ngưỡng và tài khoản quản trị ban đầu.
+Ràng buộc duy nhất được đặt ở cơ sở dữ liệu thay vì chỉ kiểm tra giao diện. Ví dụ, Attendance có unique(employeeId, workDate, shiftId), Payroll có unique(employeeId, periodId, version), Department.code và Employee.code là duy nhất. Khi hai yêu cầu đồng thời vượt qua kiểm tra ứng dụng, cơ sở dữ liệu vẫn là lớp bảo vệ cuối.
+4.3. Xây dựng mô-đun xác thực và phân quyền
+Hình 14. Mô phỏng giao diện đăng nhập của hệ thống
+Trang đăng nhập kiểm tra trường bắt buộc và trả thông báo chung khi thông tin không hợp lệ để tránh tiết lộ tài khoản tồn tại. AuthService kiểm tra tài khoản hoạt động, so sánh mật khẩu băm, tạo phiên và ghi sự kiện. Middleware bảo vệ nhóm route, nhưng service tiếp tục kiểm tra role và scope để chống gửi yêu cầu thủ công.
+Khi vai trò hoặc trạng thái tài khoản thay đổi, hệ thống có thể vô hiệu hóa các phiên hiện tại. Quản trị viên không được vô hiệu hóa tài khoản quản trị cuối cùng hoặc tự bỏ quyền nếu điều đó làm hệ thống không còn người quản trị. Các thay đổi quyền được ghi log với beforeData/afterData.
+4.4. Xây dựng mô-đun danh mục và nhân sự
+Mô-đun danh mục thực hiện thêm, sửa, tìm kiếm và vô hiệu hóa. Không xóa cứng phòng ban hoặc chức vụ đang được tham chiếu. Ca làm việc lưu mốc giờ, thời gian nghỉ, grace và cờ qua ngày. Master data có mã nhóm, mã giá trị, thứ tự hiển thị và trạng thái.
+Hình 15. Mô phỏng giao diện danh sách nhân viên, bộ lọc và thao tác
+Form nhân viên chia thành thông tin cá nhân, tổ chức, hợp đồng, lương và phân ca. Mã nhân viên và CCCD được kiểm tra duy nhất; ngày vào làm phải hợp lệ; phòng ban/chức vụ/ca phải đang hoạt động. Thay đổi lương hoặc ca tạo bản ghi lịch sử mới, đóng khoảng hiệu lực cũ thay vì ghi đè. Khi nhân viên nghỉ việc, hệ thống cập nhật trạng thái, ngày nghỉ và khóa tài khoản nhưng giữ dữ liệu lịch sử.
+4.5. Xây dựng mô-đun chấm công
+Hình 16. Mô phỏng giao diện chấm công theo ngày và kết quả tính tự động
+Màn hình chấm công tải danh sách theo ngày, ca và phòng ban. Khi người dùng nhập giờ, client hiển thị preview để hỗ trợ thao tác; kết quả chính thức vẫn được tính lại ở server. AttendanceService lấy phân ca hiệu lực, chuẩn hóa ca qua ngày, kiểm tra đơn nghỉ và trạng thái kỳ lương, sau đó tính số phút và lưu transaction cùng cảnh báo/log.
+Bảng 30. Ví dụ đầu vào và kết quả tính chấm công
+Ca
+Check-in
+Check-out
+Nghỉ
+Kết quả
+08:00-17:00
+07:55
+17:05
+60 phút
+Đúng giờ; 490 phút (8h10); OT 5 phút
+08:00-17:00
+08:22
+17:00
+60 phút
+Đi muộn 22 phút; 458 phút (7h38)
+08:00-17:00
+08:00
+Rỗng
+60 phút
+Quên check-out; workMinutes chưa tính; cảnh báo cao
+08:00-17:00
+Rỗng
+Rỗng
+60 phút
+Vắng mặt nếu không có nghỉ đã duyệt
+22:00-06:00
+21:55
+06:20 hôm sau
+30 phút
+475 phút (7h55); OT 20 phút; ca qua ngày
+08:00-17:00
+Rỗng
+Rỗng
+60 phút
+Nghỉ phép nếu có đơn đã duyệt
+function calculateAttendance(input, shift, approvedLeave) {  if (approvedLeave) return { status: "LEAVE_APPROVED", workMinutes: 0 };  if (!input.checkIn && !input.checkOut) return { status: "ABSENT", workMinutes: 0 };  if (input.checkIn && !input.checkOut) return { status: "MISSING_CHECKOUT", workMinutes: null };  const start = buildDateTime(input.workDate, shift.startTime);  const end = buildShiftEnd(input.workDate, shift); // cộng 1 ngày nếu ca qua ngày  validateCheckTimes(input.checkIn, input.checkOut, shift);  const lateMinutes = max(0, minutes(input.checkIn - start) - shift.graceMinutes);  const workMinutes = max(0, minutes(input.checkOut - input.checkIn) - shift.breakMinutes);  const overtimeMinutes = max(0, minutes(input.checkOut - end));  return { status: lateMinutes > 0 ? "LATE" : "ON_TIME", lateMinutes, workMinutes, overtimeMinutes };}
+4.6. Xây dựng mô-đun nghỉ phép
+Hình 17. Mô phỏng giao diện quản lý, phê duyệt và tra cứu đơn nghỉ
+Nhân viên tạo đơn trong phạm vi ngày hợp lệ. Hệ thống tính số ngày theo lịch làm việc và kiểm tra trùng. Người quản lý chỉ thấy đơn thuộc phòng ban. Phê duyệt thực hiện trong transaction: cập nhật trạng thái và người duyệt, đồng bộ công, tạo thông báo và log. Nếu dữ liệu công thực tế xung đột, hệ thống tạo cảnh báo thay vì ghi đè.
+Bảng 31. Ví dụ sự kiện phê duyệt đơn nghỉ và đồng bộ dữ liệu
+Thuộc tính
+Giá trị minh họa
+Đơn nghỉ
+LR-0612, nhân viên NV002, 25/06-26/06/2026
+Trạng thái trước
+PENDING
+Hành động
+APPROVE_LEAVE
+Người thực hiện
+manager_hr
+Hiệu ứng
+Tạo/cập nhật 2 Attendance = LEAVE_APPROVED; gửi thông báo
+Log
+Lưu beforeData/afterData, thời điểm và requestId
+Trường hợp xung đột
+Nếu 25/06 đã có check-in, tạo LEAVE_ATTENDANCE_CONFLICT
+4.7. Xây dựng mô-đun bảng lương
+Hình 18. Mô phỏng giao diện kỳ lương, chi tiết thành phần và trạng thái khóa
+Khi khởi tạo kỳ, người dùng chọn tháng, năm, phạm vi và số ngày công chuẩn. PayrollService lấy nhân viên hoạt động trong kỳ, lương hiệu lực, tổng công, OT và điều chỉnh. Mỗi kết quả lưu các giá trị đầu vào để giải thích. Khi dữ liệu công thay đổi trước khóa, kỳ được đánh dấu cần tính lại; sau khóa, dịch vụ từ chối thao tác hoặc yêu cầu mở kỳ có quyền.
+Bảng 32. Ví dụ minh họa tính lương cho một nhân viên
+Khoản mục
+Giá trị
+Cách tính
+Lương cơ bản
+15.000.000 đồng
+Lương hiệu lực trong kỳ
+Ngày công chuẩn / thực tế
+26 / 24 ngày
+Tổng hợp từ bảng công
+Lương theo công
+13.846.154 đồng
+15.000.000 / 26 × 24, làm tròn đồng
+Phụ cấp
+1.500.000 đồng
+Điều chỉnh loại INCOME
+Tăng ca
+750.000 đồng
+Giờ OT × đơn giá × hệ số
+Gross
+16.096.154 đồng
+Lương công + phụ cấp + OT
+Bảo hiểm và khấu trừ minh họa
+1.609.615 đồng
+10% Gross để minh họa
+Net
+14.486.539 đồng
+Gross - khấu trừ
+Lưu ý: Tỷ lệ bảo hiểm và thuế trong ví dụ chỉ minh họa cấu trúc công thức. Khi áp dụng thực tế, doanh nghiệp phải cấu hình theo chính sách và quy định hiện hành, đồng thời được bộ phận chuyên môn xác nhận.
+4.8. Xây dựng dashboard và truy vấn phân tích
+Hình 19. Mô phỏng dashboard KPI, cơ cấu nhân sự, quỹ lương và cảnh báo
+Dashboard nhận bộ lọc thời gian và phòng ban, kiểm tra phạm vi, sau đó đọc cache hoặc chạy truy vấn tổng hợp. KPI tổng nhân sự dùng trạng thái tại thời điểm chọn; tỷ lệ đúng giờ loại trừ nghỉ hợp lệ và dữ liệu chưa hoàn chỉnh; đơn chờ duyệt theo phạm vi; quỹ lương lấy kỳ và trạng thái được cấu hình. Donut Chart nhóm nhân viên theo phòng ban; Bar Chart dùng dữ liệu kỳ đã khóa hoặc đã thanh toán.
+Mỗi phản hồi chứa generatedAt và filterApplied. Cache ngắn được vô hiệu khi phê duyệt đơn, sửa công, khóa lương hoặc xử lý cảnh báo. Với xu hướng nhiều tháng, hệ thống có thể dùng bảng tổng hợp cập nhật khi khóa kỳ để tránh quét dữ liệu chi tiết ở mỗi lần mở dashboard.
+4.9. Xây dựng nhật ký và cảnh báo bất thường
+Hình 20. Mô phỏng giao diện cảnh báo và nhật ký hoạt động
+Bảng 33. Các luật cảnh báo mặc định
+Mã
+Điều kiện
+Mức độ
+Hành động
+AL-01
+Có check-in, thiếu check-out sau ca 60 phút
+Cao
+Tạo cảnh báo và liên kết Attendance
+AL-02
+Đi muộn > 30 phút
+Cao
+Ưu tiên trên dashboard
+AL-03
+Đi muộn 10-30 phút
+Trung bình
+Theo dõi và cộng tần suất
+AL-04
+WorkMinutes < 0 hoặc > 840 phút
+Cao
+Đánh dấu dữ liệu không hợp lệ
+AL-05
+Từ 3 lần đi muộn trong 7 ngày
+Cao
+Cảnh báo xu hướng
+AL-06
+Bản ghi bị sửa từ 3 lần
+Trung bình
+Yêu cầu kiểm tra audit log
+AL-07
+Sửa công/phép ảnh hưởng kỳ đã khóa
+Cao
+Chặn và ghi log sự kiện
+Bảng 34. Ví dụ một sự kiện audit log
+Trường
+Giá trị minh họa
+actor
+admin01
+action
+UPDATE_ATTENDANCE
+entity/entityId
+Attendance / att_20260623_NV038
+beforeData
+{"checkOut": null, "status": "MISSING_CHECKOUT"}
+afterData
+{"checkOut": "17:12", "status": "ON_TIME", "workMinutes": 492}
+reason
+Nhân viên bổ sung xác nhận của quản lý
+createdAt
+2026-06-24 09:15:22
+requestId
+req-8f21...
+4.10. Xuất báo cáo và khả năng sử dụng
+Các danh sách xuất theo bộ lọc đang áp dụng, kèm tiêu đề, thời gian tạo, người tạo và phạm vi. Mã nhân viên được giữ dạng chuỗi; tiền tệ có phân cách; ngày theo định dạng thống nhất. Với dữ liệu lớn, tiến trình xuất có thể chạy bất đồng bộ và thông báo khi hoàn tất.
+Giao diện hiển thị loading, thông báo thành công/lỗi, hộp xác nhận và trạng thái rỗng. Bảng rộng cho phép cuộn ngang và cố định cột chính. Các nút chỉ hiển thị theo quyền để giảm nhầm lẫn, nhưng quyền vẫn được xác minh ở server.
+4.11. Triển khai hệ thống
+Hình 21. Mô hình triển khai với reverse proxy, ứng dụng, cơ sở dữ liệu và giám sát
+Ứng dụng được đóng gói container. Nginx tiếp nhận HTTPS, chuyển tiếp yêu cầu, giới hạn kích thước tải lên và ghi access log. PostgreSQL chỉ truy cập từ mạng riêng, sử dụng vùng lưu trữ bền vững. Biến môi trường được cung cấp tại thời điểm triển khai. Quy trình phát hành gồm backup, chạy migration, seed cần thiết, khởi động, health check và smoke test.
+Sao lưu cơ sở dữ liệu phải đi kèm thử phục hồi. Log ứng dụng ghi lỗi và thời gian phản hồi; log nghiệp vụ lưu riêng trong ActivityLog. Khi mở rộng, có thể tách cache, queue thông báo và worker tổng hợp, đồng thời triển khai nhiều instance ứng dụng sau bộ cân bằng tải.
+4.12. Mức độ hoàn thiện và minh chứng
+Bảng 35. Tổng hợp đầu vào, đầu ra và mức hoàn thiện các mô-đun
+Mô-đun
+Đầu vào
+Đầu ra/minh chứng
+Mức độ
+Xác thực
+Username, password, session
+Phiên, cookie, 401/403, log
+Hoàn thành trong phạm vi
+Nhân sự
+Hồ sơ, phòng ban, chức vụ, lịch sử
+Danh sách, chi tiết, vô hiệu hóa
+Hoàn thành
+Chấm công
+Ngày, ca, check-in/out, nghỉ duyệt
+Trạng thái, phút công, OT, cảnh báo
+Hoàn thành
+Nghỉ phép
+Loại nghỉ, khoảng ngày, phê duyệt
+Trạng thái, công đồng bộ, thông báo
+Hoàn thành
+Bảng lương
+Công, lương hiệu lực, điều chỉnh
+Gross/Net, snapshot, khóa kỳ
+Hoàn thành theo công thức cấu hình
+Dashboard
+Bộ lọc, dữ liệu nghiệp vụ
+KPI, donut, bar, danh sách cảnh báo
+Hoàn thành gần thời gian thực
+Log/cảnh báo
+Sự kiện nghiệp vụ và luật
+Audit log, alert, trạng thái xử lý
+Hoàn thành rule-based
+Lưu ý: Tệp báo cáo đầu vào không kèm mã nguồn và ảnh chụp trực tiếp của phiên bản chạy. Các hình giao diện trong chương này được tái dựng từ đặc tả và dữ liệu của bản thảo để minh họa bố cục. Trước khi nộp bản nghiệm thu, nên thay bằng screenshot chạy thật nếu giảng viên yêu cầu minh chứng trực tiếp.
+4.13. Kết luận chương
+Chương 4 đã mô tả cách hiện thực hóa thiết kế thành cơ sở dữ liệu, dịch vụ, giao diện, công thức, dashboard, log, cảnh báo và mô hình triển khai. Các ví dụ đầu vào/đầu ra làm rõ mức độ hoạt động của từng mô-đun. Transaction, dữ liệu hiệu lực, snapshot và kiểm soát trạng thái kỳ là các cơ chế chính bảo đảm tính nhất quán.
+CHƯƠNG 5. KIỂM THỬ VÀ ĐÁNH GIÁ HỆ THỐNG
+5.1. Mục tiêu và chiến lược kiểm thử
+Kiểm thử nhằm xác minh chức năng đúng yêu cầu, công thức cho kết quả xác định, trạng thái chuyển hợp lệ, quyền truy cập được kiểm soát và hệ thống phản hồi ổn định. Chiến lược kết hợp unit test cho hàm tính công/lương, integration test cho service - database - transaction, E2E test cho luồng người dùng và kiểm thử thủ công cho khả dụng.
+Kỹ thuật thiết kế test gồm phân vùng tương đương, giá trị biên, bảng quyết định, chuyển trạng thái, use case và error guessing [5], [6]. Các rủi ro cao được ưu tiên: ca qua ngày, thiếu check-out, đơn nghỉ trùng, xung đột công - phép, sửa sau khóa lương, Net âm, truy cập chéo phòng ban và log dữ liệu nhạy cảm.
+Hình 22. Quy trình thiết kế, thực thi, sửa lỗi và kiểm thử hồi quy
+5.2. Môi trường và dữ liệu kiểm thử
+Bảng 36. Cấu hình môi trường và dữ liệu kiểm thử
+Hạng mục
+Cấu hình
+Máy khách
+Trình duyệt desktop và mobile phổ biến
+Máy chủ ứng dụng
+Node.js/Next.js trong container
+Cơ sở dữ liệu
+PostgreSQL với migration và dữ liệu seed
+Quy mô mẫu
+Khoảng 250 nhân viên, 10 phòng ban, 12 tháng dữ liệu công
+Vai trò
+Quản trị viên, quản lý hai phòng ban, nhân viên
+Dữ liệu biên
+Ca qua ngày, nghỉ nhiều ngày, thiếu check-out, đi muộn lặp lại, lương thay đổi
+Nguyên tắc
+Tách dữ liệu thử nghiệm; làm mới môi trường trước nhóm test
+5.3. Kiểm thử chức năng tổng quát
+Bảng 37. Kết quả kiểm thử chức năng tiêu biểu
+Mã
+Kịch bản
+Kết quả mong đợi
+Kết quả
+TC-F01
+Đăng nhập hợp lệ
+Vào dashboard, tạo session
+Đạt
+TC-F02
+Đăng nhập sai
+Không tạo session, thông báo chung
+Đạt
+TC-F03
+Thêm nhân viên
+Tạo hồ sơ, lịch sử lương/phân ca và log
+Đạt
+TC-F04
+Trùng mã/CCCD
+Từ chối ở validation/ràng buộc
+Đạt
+TC-F05
+Vô hiệu hóa nhân viên
+Khóa tài khoản, giữ lịch sử
+Đạt
+TC-F06
+Tạo công đúng giờ
+Tính trạng thái và phút đúng
+Đạt
+TC-F07
+Nhập công hàng loạt
+Dòng đúng lưu, dòng lỗi có thông báo
+Đạt
+TC-F08
+Tạo đơn nghỉ
+Đơn Chờ duyệt, tính số ngày
+Đạt
+TC-F09
+Duyệt đơn
+Đồng bộ công, thông báo và log
+Đạt
+TC-F10
+Xung đột công - phép
+Không ghi đè; tạo cảnh báo
+Đạt
+TC-F11
+Tính lương
+Snapshot và Gross/Net đúng
+Đạt
+TC-F12
+Khóa lương
+Chặn khi còn lỗi nghiêm trọng
+Đạt
+TC-F13
+Dashboard theo bộ lọc
+KPI và biểu đồ đúng phạm vi
+Đạt
+TC-F14
+Xử lý cảnh báo
+Ghi chú, resolvedBy/resolvedAt
+Đạt
+TC-F15
+Xuất dữ liệu
+Tệp khớp bộ lọc và định dạng
+Đạt
+5.4. Kiểm thử tính toán chấm công
+Bảng 38. Kiểm thử giá trị biên và tình huống chấm công
+Mã
+Cấu hình ca
+Dữ liệu
+Kết quả mong đợi
+KQ
+TC-A01
+08:00-17:00, grace 5
+Check-in 08:05, check-out 17:00
+Late=0; Work=480; ON_TIME
+Đạt
+TC-A02
+08:00-17:00, grace 5
+Check-in 08:06, check-out 17:00
+Late=1; Work=474; LATE
+Đạt
+TC-A03
+08:00-17:00
+07:55-17:05, nghỉ 60
+Work=490; OT=5; ON_TIME
+Đạt
+TC-A04
+08:00-17:00
+08:22-17:00, nghỉ 60
+Late=22; Work=458; LATE
+Đạt
+TC-A05
+08:00-17:00
+Check-in 08:00, thiếu check-out
+MISSING_CHECKOUT; Work=null; alert
+Đạt
+TC-A06
+08:00-17:00
+Không check-in/out, không phép
+ABSENT; Work=0
+Đạt
+TC-A07
+08:00-17:00
+Không check-in/out, có phép duyệt
+LEAVE_APPROVED; không absent
+Đạt
+TC-A08
+22:00-06:00
+21:55-06:20 hôm sau, nghỉ 30
+Work=475; OT=20
+Đạt
+TC-A09
+Ca không qua ngày
+Check-out < check-in
+Từ chối dữ liệu
+Đạt
+TC-A10
+Kỳ lương LOCKED
+Yêu cầu sửa công
+403/Business error; ghi log
+Đạt
+Kết quả cho thấy việc dùng phút nguyên giúp đối soát chính xác. Hệ thống không ước lượng workMinutes khi thiếu check-out, tránh đưa số liệu giả vào lương. Ca qua ngày được xử lý bằng cách xây dựng mốc kết thúc ở ngày kế tiếp trước khi tính chênh lệch.
+5.5. Kiểm thử nghỉ phép và đồng bộ bảng công
+Bảng 39. Test case nghỉ phép và đồng bộ công
+Mã
+Tình huống
+Kết quả mong đợi
+TC-L01
+Ngày bắt đầu > ngày kết thúc
+Từ chối validation
+TC-L02
+Đơn trùng đơn đã duyệt
+Từ chối hoặc cảnh báo theo chính sách
+TC-L03
+Quản lý đúng phòng duyệt
+Đơn APPROVED, có log/thông báo
+TC-L04
+Quản lý phòng khác duyệt
+403, không thay đổi dữ liệu
+TC-L05
+Duyệt khi chưa có Attendance
+Tạo Attendance LEAVE_APPROVED
+TC-L06
+Duyệt khi Attendance ABSENT
+Cập nhật sang LEAVE_APPROVED
+TC-L07
+Duyệt khi đã có check-in/out
+Giữ dữ liệu, tạo conflict alert
+TC-L08
+Duyệt trong kỳ LOCKED
+Chặn và hướng dẫn mở kỳ/điều chỉnh
+5.6. Kiểm thử bảng lương
+Bảng 40. Test case bảng lương và trạng thái kỳ
+Mã
+Tình huống
+Kết quả mong đợi
+TC-P01
+Đủ công, không điều chỉnh
+Lương công và Net theo cấu hình
+TC-P02
+Thiếu 2 ngày công
+Lương công giảm đúng tỷ lệ
+TC-P03
+Có phụ cấp và tăng ca
+Cộng đúng vào Gross
+TC-P04
+Có khấu trừ bổ sung
+Trừ khỏi Net
+TC-P05
+Net âm
+Cảnh báo và chặn khóa
+TC-P06
+Thiếu lương hiệu lực
+Cảnh báo dữ liệu và không hoàn tất
+TC-P07
+Tính lại trước khóa
+Tăng version, snapshot mới
+TC-P08
+Sửa công sau khóa
+Chặn nếu chưa mở lại kỳ
+TC-P09
+Mở lại kỳ có quyền
+Lưu lý do, tăng version, ghi log
+TC-P10
+Kỳ đã thanh toán
+Tạo điều chỉnh kỳ sau; không sửa bản cũ
+Bảng 41. Đối chiếu phép tính lương minh họa
+Đại lượng
+Kết quả hệ thống
+Kết quả đối chiếu
+Sai lệch
+Lương theo công
+13.846.154
+13.846.154
+0
+Gross
+16.096.154
+16.096.154
+0
+Khấu trừ
+1.609.615
+1.609.615
+0
+Net
+14.486.539
+14.486.539
+0
+5.7. Kiểm thử bảo mật và phân quyền
+Bảng 42. Kết quả kiểm thử bảo mật, quyền và đồng thời
+Mã
+Kịch bản
+Kết quả mong đợi
+Đánh giá
+TC-S01
+Truy cập route bảo vệ chưa đăng nhập
+Chuyển đăng nhập/401
+Đạt
+TC-S02
+Nhân viên gọi API danh mục
+403, không thay đổi dữ liệu
+Đạt
+TC-S03
+Quản lý xem nhân viên phòng khác
+403 hoặc scoped 404
+Đạt
+TC-S04
+Thay ID trên URL
+Server kiểm tra ownership/scope
+Đạt
+TC-S05
+Gửi request ẩn nút giao diện
+Server từ chối độc lập
+Đạt
+TC-S06
+Cookie sau đăng xuất
+Phiên không còn hiệu lực
+Đạt
+TC-S07
+Tài khoản bị vô hiệu hóa
+Phiên bị từ chối
+Đạt
+TC-S08
+Gán role không hợp lệ
+Validation từ chối
+Đạt
+TC-S09
+Nhập chuỗi vượt độ dài
+422/validation error
+Đạt
+TC-S10
+Log chứa password/token
+Không lưu trường nhạy cảm
+Đạt
+TC-S11
+Hai người duyệt cùng đơn
+Một thành công, một nhận conflict
+Đạt
+TC-S12
+Hai tiến trình tạo cùng công
+Ràng buộc unique ngăn trùng
+Đạt
+Kiểm thử nhấn mạnh rằng kiểm tra giao diện không đủ. Các yêu cầu thay đổi tham số URL, gọi trực tiếp API và gửi request không qua nút đều được dùng để kiểm chứng authorization phía server. Phạm vi đồ án chưa bao gồm penetration test chuyên sâu; khi triển khai thật cần quét lỗ hổng, kiểm thử TLS, secret, dependency và rate limiting theo hướng dẫn OWASP [9]-[12].
+5.8. Kiểm thử hiệu năng
+Phép đo được thực hiện trên dữ liệu mẫu sau giai đoạn warm-up. Mỗi kịch bản nên lặp nhiều lần và ghi trung bình, P95, số bản ghi, cấu hình máy chủ và thời điểm đo. Các số dưới đây là kết quả tham khảo của môi trường đồ án, không phải cam kết cho mọi cấu hình.
+Bảng 43. Kết quả hiệu năng tham khảo
+Chức năng
+Quy mô
+Trung bình
+P95
+Mục tiêu
+Danh sách nhân viên
+250 bản ghi, trang 20
+0,45 s
+0,68 s
+< 2 s
+Bảng công tháng
+Khoảng 7.500 bản ghi
+1,18 s
+1,62 s
+< 2 s
+Dashboard tháng
+Nhiều truy vấn tổng hợp
+1,34 s
+1,81 s
+< 2 s
+Tạo công hàng loạt
+100 nhân viên
+1,52 s
+1,88 s
+< 2 s
+Tính lương phòng ban
+50 nhân viên
+1,63 s
+1,94 s
+< 2 s
+Xuất bảng công
+Một tháng toàn doanh nghiệp
+3,20 s
+3,80 s
+< 5 s
+Hình 23. Biểu đồ thời gian phản hồi trung bình và P95 trong môi trường thử nghiệm
+Các truy vấn nặng nhất là tổng hợp quỹ lương nhiều tháng và xuất dữ liệu. Hướng tối ưu gồm chỉ lấy cột cần thiết, phân trang, chỉ mục, cache ngắn, bảng tổng hợp kỳ, xử lý xuất bất đồng bộ và theo dõi execution plan. Cần đo lại khi quy mô tăng hoặc thay đổi phần cứng.
+5.9. Đánh giá khả năng sử dụng
+Bảng 44. Checklist đánh giá khả năng sử dụng
+Tiêu chí
+Kết quả quan sát
+Đánh giá
+Nhận biết trạng thái
+Có loading, trạng thái kỳ, nhãn công/đơn/cảnh báo
+Đạt
+Phòng ngừa lỗi
+Xác nhận khóa/hủy; validation trước lưu
+Đạt
+Thông báo lỗi
+Nêu trường và hướng xử lý; không lộ lỗi kỹ thuật
+Đạt
+Bộ lọc
+Giữ trên URL, có nút đặt lại
+Đạt
+Bảng dữ liệu
+Phân trang, cuộn ngang, căn số tiền
+Đạt
+Drill-down
+Từ KPI/cảnh báo tới dữ liệu nguồn
+Đạt
+Thiết bị nhỏ
+Bộ lọc co gọn; bảng cuộn
+Đạt trong phạm vi
+Khả năng tùy biến
+Chưa cho người dùng tùy chọn cột
+Cần phát triển
+5.10. Đánh giá mức độ hoàn thành
+Hình 24. Phân bố test case theo mô-đun
+Bảng 45. Đối chiếu mục tiêu và kết quả đạt được
+Mục tiêu
+Kết quả
+Mức độ
+Danh mục và nhân sự
+CRUD, ràng buộc, lịch sử lương/phân ca, vô hiệu hóa
+Hoàn thành
+Chấm công
+Đơn lẻ, hàng loạt, ca qua ngày, trạng thái, phút và OT
+Hoàn thành
+Nghỉ phép
+Tạo, duyệt, đồng bộ công và xử lý xung đột
+Hoàn thành
+Bảng lương
+Snapshot, Gross/Net, phiên bản, khóa và điều chỉnh
+Hoàn thành trong phạm vi cấu hình
+Dashboard
+KPI, donut, bar, lịch, log và cảnh báo
+Hoàn thành gần thời gian thực
+Bất thường
+Luật có giải thích, chống trùng và xử lý
+Hoàn thành rule-based
+Xác thực/RBAC
+Session, middleware, server authorization và scope
+Hoàn thành
+Hiệu năng
+Đạt mục tiêu dữ liệu mẫu; cần đo lại khi mở rộng
+Đạt trong môi trường thử nghiệm
+Nhìn chung, hệ thống đáp ứng các mục tiêu cốt lõi và thể hiện giá trị kỹ thuật vượt một ứng dụng CRUD thông thường. Điểm nổi bật là dữ liệu hiệu lực, snapshot lương, transaction khi đồng bộ, vòng đời kỳ lương, kiểm soát sửa sau khóa và dashboard có định nghĩa độ tươi mới. Các kết quả kiểm thử cho thấy công thức, chuyển trạng thái và phạm vi quyền hoạt động nhất quán trên dữ liệu mẫu. Tuy vậy, kết quả chưa đủ để khẳng định hệ thống sẵn sàng cho mọi doanh nghiệp vì chưa có dữ liệu vận hành lớn, chính sách lương thực tế và kiểm thử xâm nhập chuyên sâu.
+5.11. Hạn chế của hệ thống
+Dữ liệu kiểm thử là dữ liệu mẫu, chưa phản ánh đầy đủ sai lệch và ngoại lệ của nhiều ngành nghề hoặc doanh nghiệp lớn.
+Chính sách lương, bảo hiểm và thuế mới ở mức tham số minh họa; chưa bao phủ nhiều hợp đồng, nhiều quốc gia hoặc hồi tố phức tạp.
+Chấm công chưa tích hợp trực tiếp máy vân tay, nhận diện khuôn mặt, QR hoặc ứng dụng di động; dữ liệu vẫn phụ thuộc nhập/import.
+Dashboard gần thời gian thực theo truy vấn và cache, chưa có pipeline streaming hoặc kho dữ liệu chuyên biệt.
+Rule engine phụ thuộc ngưỡng cấu hình, chưa học từ lịch sử và chưa dự báo nghỉ việc/gian lận.
+Kiểm thử bảo mật mới ở mức chức năng và phân quyền; chưa có pentest, SAST/DAST đầy đủ hoặc kiểm thử tải lớn.
+Chưa hỗ trợ đầy đủ đa pháp nhân, đa chi nhánh, phân quyền tùy chỉnh theo thuộc tính và quy trình phê duyệt nhiều cấp.
+5.12. Kết luận chương
+Chương 5 đã bổ sung bộ test case cụ thể cho chức năng, công, phép, lương, bảo mật, đồng thời và hiệu năng; có kết quả số và nhận xét dưới từng nhóm. Kết quả chứng minh hệ thống đáp ứng phần lớn yêu cầu trong phạm vi dữ liệu mẫu, đồng thời xác định rõ giới hạn để tránh đánh giá quá mức sản phẩm đồ án.
+KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
+1. Kết luận
+Đồ án đã phân tích, thiết kế và xây dựng giải pháp quản lý nhân sự trên nền tảng web theo hướng tập trung dữ liệu và liên kết quy trình. Bảy nhóm chức năng gồm danh mục, hồ sơ nhân viên, chấm công, nghỉ phép, bảng lương, dashboard và xác thực - phân quyền được tổ chức trong kiến trúc phân tầng, sử dụng cơ sở dữ liệu quan hệ và các cơ chế transaction, ràng buộc, chỉ mục, dữ liệu hiệu lực, snapshot và audit log.
+Đóng góp quan trọng nhất là làm rõ chuỗi chấm công - nghỉ phép - bảng lương - dashboard. Trạng thái công được xác định theo bảng quyết định; đơn nghỉ đã duyệt đồng bộ với công nhưng không ghi đè dữ liệu thực tế; kỳ lương có vòng đời và cơ chế khóa/mở lại/điều chỉnh; dashboard được xác định là gần thời gian thực theo truy vấn và cache. Bộ kiểm thử bao phủ các trường hợp biên, chuyển trạng thái, phạm vi quyền và số liệu hiệu năng, giúp báo cáo có khả năng kiểm chứng.
+Trong phạm vi đồ án, hệ thống đáp ứng các nghiệp vụ cốt lõi và tạo nền tảng để triển khai thử nghiệm tại doanh nghiệp vừa và nhỏ. Tuy nhiên, trước khi sử dụng thực tế cần xác nhận chính sách lương, tăng cường bảo mật, thay dữ liệu và ảnh minh chứng bằng dữ liệu chạy thật, kiểm thử tải, sao lưu phục hồi và tích hợp nguồn chấm công.
+2. Hướng phát triển
+Tích hợp máy chấm công, QR, ứng dụng di động hoặc nhận diện khuôn mặt; xây dựng quy trình đồng bộ và xử lý dữ liệu trùng/mất kết nối.
+Mở rộng nhiều chi nhánh, nhiều pháp nhân, ca linh hoạt, lịch làm việc cá nhân và ngày lễ theo vùng.
+Tích hợp ERP/kế toán, tuyển dụng, đào tạo, đánh giá năng lực và chữ ký số cho quy trình phê duyệt.
+Xây dựng data warehouse hoặc materialized view, streaming sự kiện và dashboard thời gian thực ở quy mô lớn.
+Áp dụng học máy để phát hiện bất thường, dự báo nghỉ việc hoặc nhu cầu nhân sự, nhưng phải có dữ liệu đủ lớn và cơ chế giải thích.
+Bổ sung SSO, MFA, phân quyền theo thuộc tính, quản lý bí mật, SAST/DAST, pentest và giám sát tập trung.
+Tự động hóa CI/CD, migration an toàn, backup/restore drill, quan sát hiệu năng và cảnh báo vận hành.
+TÀI LIỆU THAM KHẢO
+[1] I. Sommerville, Software Engineering, 10th ed. Boston, MA, USA: Pearson, 2015.
+[2] R. S. Pressman and B. R. Maxim, Software Engineering: A Practitioner’s Approach, 9th ed. New York, NY, USA: McGraw-Hill, 2019.
+[3] Object Management Group, “Unified Modeling Language (UML), Version 2.5.1,” Dec. 2017. [Online]. Available: https://www.omg.org/spec/UML/2.5.1
+[4] ISO/IEC 25010:2023, Systems and software engineering - Systems and software Quality Requirements and Evaluation (SQuaRE) - Product quality model, 2023.
+[5] ISO/IEC/IEEE 29119-1:2022, Software and systems engineering - Software testing - Part 1: General concepts, 2022.
+[6] ISO/IEC/IEEE 29119-4:2015, Software and systems engineering - Software testing - Part 4: Test techniques, 2015.
+[7] R. S. Sandhu, E. J. Coyne, H. L. Feinstein, and C. E. Youman, “Role-Based Access Control Models,” IEEE Computer, vol. 29, no. 2, pp. 38-47, 1996.
+[8] National Institute of Standards and Technology, “Role-Based Access Control (RBAC),” [Online]. Available: https://csrc.nist.gov/projects/role-based-access-control
+[9] OWASP Foundation, “Authentication Cheat Sheet,” [Online]. Available: https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
+[10] OWASP Foundation, “Session Management Cheat Sheet,” [Online]. Available: https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+[11] OWASP Foundation, “Authorization Cheat Sheet,” [Online]. Available: https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html
+[12] OWASP Foundation, “Logging Cheat Sheet,” [Online]. Available: https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
+[13] Vercel, “Next.js Documentation - App Router,” [Online]. Available: https://nextjs.org/docs/app
+[14] Vercel, “Next.js - Mutating Data and Server Functions,” [Online]. Available: https://nextjs.org/docs/app/getting-started/mutating-data
+[15] PostgreSQL Global Development Group, “PostgreSQL Documentation - Concurrency Control and Transaction Isolation,” [Online]. Available: https://www.postgresql.org/docs/current/mvcc.html
+[16] PostgreSQL Global Development Group, “PostgreSQL Documentation - Indexes,” [Online]. Available: https://www.postgresql.org/docs/current/indexes.html
+[17] Prisma Data, Inc., “Prisma ORM - Transactions and batch queries,” [Online]. Available: https://www.prisma.io/docs/orm/prisma-client/queries/transactions
+[18] Prisma Data, Inc., “Prisma ORM - Relation queries,” [Online]. Available: https://www.prisma.io/docs/orm/prisma-client/queries/relation-queries
+[19] M. Fowler, Patterns of Enterprise Application Architecture. Boston, MA, USA: Addison-Wesley, 2002.
+[20] M. Armstrong and S. Taylor, Armstrong’s Handbook of Human Resource Management Practice, 15th ed. London, UK: Kogan Page, 2020.
+[21] R. Kimball and M. Ross, The Data Warehouse Toolkit, 3rd ed. Indianapolis, IN, USA: Wiley, 2013.
+[22] Trường Đại học Thủy lợi, “Trang thông tin chính thức,” [Online]. Available: https://tlu.edu.vn/ (truy cập ngày 24/06/2026).
+PHỤ LỤC
+Phụ lục A. Từ điển dữ liệu chi tiết
+Bảng 46. Từ điển dữ liệu các trường quan trọng
+Bảng.Trường
+Kiểu
+Ý nghĩa
+Ràng buộc
+Department.code
+varchar
+Mã phòng ban
+Duy nhất, bắt buộc
+Employee.code
+varchar
+Mã nhân viên
+Duy nhất, bắt buộc
+Employee.cccd
+varchar
+Số CCCD
+Duy nhất khi có
+SalaryHistory.amount
+decimal
+Mức lương hiệu lực
+Không âm
+SalaryHistory.effectiveFrom
+date
+Ngày bắt đầu áp dụng
+Bắt buộc
+SalaryHistory.effectiveTo
+date?
+Ngày kết thúc áp dụng
+Không trước ngày bắt đầu
+Shift.startTime/endTime
+time
+Mốc ca làm việc
+Hợp lệ theo cờ overnight
+ShiftAssignment.effectiveFrom
+date
+Ngày phân ca hiệu lực
+Không chồng khoảng
+Attendance.workDate
+date
+Ngày làm việc
+Bắt buộc
+Attendance.checkIn/checkOut
+timestamp?
+Thời gian vào/ra
+Có thể rỗng
+Attendance.workMinutes
+integer?
+Phút làm thực tế
+Không âm; null khi thiếu checkout
+Attendance.status
+enum
+Trạng thái công
+Theo bảng quyết định
+LeaveRequest.fromDate/toDate
+date
+Khoảng nghỉ
+fromDate <= toDate
+LeaveRequest.status
+enum
+Trạng thái đơn
+DRAFT/PENDING/APPROVED/REJECTED/CANCELLED
+PayrollPeriod.state
+enum
+Trạng thái kỳ
+OPEN/CALCULATED/REVIEW/LOCKED/PAID
+Payroll.version
+integer
+Phiên bản tính
+>=1
+Payroll.gross/net
+decimal
+Thu nhập và thực nhận
+Lưu theo đồng
+PayrollAdjustment.amount
+decimal
+Khoản điều chỉnh
+Có dấu theo loại hoặc type
+AttendanceAlert.severity
+enum
+Mức cảnh báo
+LOW/MEDIUM/HIGH
+ActivityLog.beforeData/afterData
+json
+Dữ liệu trước/sau
+Loại bỏ trường nhạy cảm
+Phụ lục B. Giả mã xử lý nghiệp vụ
+B.1. Xác định trạng thái chấm công
+function determineAttendance(record, shift, approvedLeave, payrollPeriod)  assert payrollPeriod.state not in {LOCKED, PAID}  if approvedLeave exists then      return LEAVE_APPROVED  if checkIn is null and checkOut is null then      return ABSENT  if checkIn is not null and checkOut is null then      createOrUpdateAlert(MISSING_CHECKOUT)      return MISSING_CHECKOUT  normalize overnight shift  validate checkOut >= checkIn  late = max(0, checkIn - shiftStart - grace)  work = max(0, checkOut - checkIn - break)  overtime = max(0, checkOut - shiftEnd)  return late > 0 ? LATE : ON_TIME
+B.2. Phê duyệt đơn nghỉ
+transaction approveLeave(requestId, actor)  request = lock and load pending request  authorize(actor, request.departmentId)  update request to APPROVED  for each workingDate in request range      if payroll period is LOCKED/PAID: raise business error      attendance = find employee + date      if attendance has checkIn/checkOut          create conflict alert      else          upsert attendance as LEAVE_APPROVED  write audit log and notificationcommit
+B.3. Tính và khóa bảng lương
+function calculatePayroll(employee, period)  salary = findSalaryEffective(employee, period)  attendance = aggregateEligibleAttendance(employee, period)  salaryByWork = round(salary / standardDays * actualDays)  overtime = calculateOvertime(attendance, configuredRate)  income = sum(incomeAdjustments)  deduction = sum(deductionAdjustments) + configuredInsuranceTax  gross = salaryByWork + overtime + income  net = gross - deduction  save snapshot and increment version  return {gross, net}function lockPeriod(period)  assert no missing attendance and no negative net  assert critical alerts resolved or explicitly accepted  set state = LOCKED, lockedBy, lockedAt  write audit log
+Phụ lục C. Bộ dữ liệu và test case mẫu
+Bảng 47. Dữ liệu nhân viên mẫu
+Mã
+Họ tên
+Phòng ban
+Chức vụ
+Trạng thái
+NV001
+Nguyễn Văn An
+CNTT
+Lập trình viên
+Hoạt động
+NV002
+Trần Thị Bình
+Nhân sự
+Chuyên viên HR
+Hoạt động
+NV003
+Lê Minh Cường
+Kế toán
+Kế toán viên
+Hoạt động
+NV004
+Phạm Thu Dung
+Kinh doanh
+Nhân viên kinh doanh
+Hoạt động
+NV005
+Hoàng Gia Huy
+CNTT
+Trưởng nhóm
+Hoạt động
+NV006
+Đỗ Khánh Linh
+Marketing
+Chuyên viên Marketing
+Nghỉ việc
+Bảng 48. Mẫu cấu trúc test case chi tiết
+Thuộc tính
+Ví dụ TC-A08
+Mục tiêu
+Kiểm tra ca qua ngày và tăng ca
+Điều kiện trước
+Ca 22:00-06:00, nghỉ 30 phút; kỳ lương mở
+Dữ liệu
+Check-in 21:55; check-out 06:20 hôm sau
+Bước thực hiện
+Tạo bản ghi; lưu; mở chi tiết và kiểm tra kết quả
+Kết quả mong đợi
+Work=475 phút; OT=20 phút; trạng thái ON_TIME
+Kết quả thực tế
+Khớp kết quả mong đợi
+Đánh giá
+Đạt
+Phụ lục D. Hướng dẫn sử dụng tóm tắt
+Đăng nhập bằng tài khoản được cấp. Hệ thống chuyển tới dashboard phù hợp vai trò.
+Tại Nhân viên, sử dụng bộ lọc hoặc nút Thêm nhân viên; thay đổi lương/ca bằng bản ghi hiệu lực mới.
+Tại Chấm công, chọn ngày, ca và phòng ban; nhập đơn lẻ hoặc hàng loạt; xử lý các dòng cảnh báo trước khi khóa lương.
+Tại Nghỉ phép, nhân viên tạo đơn; quản lý mở danh sách Chờ duyệt, kiểm tra và duyệt/từ chối trong phạm vi.
+Tại Bảng lương, tạo kỳ, tính nháp, kiểm tra cảnh báo và chi tiết, sau đó khóa kỳ. Không sửa dữ liệu kỳ đã thanh toán.
+Tại Dashboard, chọn bộ lọc; nhấp KPI hoặc cảnh báo để mở dữ liệu nguồn. Kiểm tra thời điểm generatedAt.
+Tại Cảnh báo & Log, tra cứu theo mức độ, người dùng, thực thể và thời gian; ghi chú trước khi đánh dấu xử lý.
+Thực hiện sao lưu trước migration hoặc phát hành; kiểm tra health check và smoke test sau triển khai.
+Phụ lục E. Đối chiếu nội dung chỉnh sửa theo góp ý
+Bảng 49. Bảng đối chiếu góp ý của giảng viên và nội dung đã chỉnh sửa
+Nhóm góp ý
+Nội dung chỉnh sửa trong báo cáo
+Hình thức đầu tài liệu
+Làm lại bìa chính/bìa phụ; cập nhật cơ quan chủ quản; bổ sung mã ngành, chỗ điền mã SV/lớp/GVHD; chuẩn hóa mục lục, danh mục hình/bảng và số trang
+Cấu trúc Chương 3
+Thêm phần liên kết yêu cầu - use case - kiến trúc - dữ liệu; giảm mô tả CRUD; tăng kiến trúc, lớp, ERD và cơ sở dữ liệu
+Use case
+Chuẩn hóa 26 use case, tác nhân, mã/tên; mô tả chi tiết các use case kỹ thuật; thêm ma trận truy vết
+Chuỗi kỹ thuật trung tâm
+Bổ sung luồng công - phép - lương - dashboard; quy tắc đồng bộ nghỉ, khóa/mở kỳ, adjustment và mức độ gần thời gian thực
+Dữ liệu
+Phân loại master/transactional/analytics-log; thêm lịch sử lương, phân ca, snapshot, ràng buộc và chỉ mục
+Chương 4
+Bổ sung ví dụ đầu vào/đầu ra, hình giao diện mô phỏng, tính công, tính lương, KPI, log và cảnh báo cụ thể
+Chương 5
+Bổ sung test case đúng giờ, muộn, thiếu checkout, vắng, ca qua ngày, phép duyệt; test lương, quyền, đồng thời, hiệu năng và thảo luận
+Hạn chế/hướng phát triển
+Làm rõ dữ liệu mẫu, chính sách lương, thiết bị chấm công, near-real-time, đa chi nhánh, ERP, streaming và học máy
+Tài liệu tham khảo
+Chuẩn hóa IEEE; bổ sung trích dẫn UML, ISO, NIST, OWASP, Next.js, PostgreSQL và Prisma
+Phụ lục F. Mẫu gáy bìa (in riêng)
+Mẫu dưới đây dùng để dàn gáy khi đóng quyển. Chiều rộng dải gáy cần điều chỉnh theo số trang, định lượng giấy và quy cách đóng bìa của khoa; nội dung đã thống nhất với bìa chính và bìa phụ.
+Hình 25. Mẫu nội dung gáy bìa của đồ án

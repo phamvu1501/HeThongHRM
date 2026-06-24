@@ -255,6 +255,7 @@ export default function DonTuPage() {
   const [deleteTarget, setDeleteTarget] = useState<LeaveRequest | null>(null)
   const [form, setForm] = useState(emptyForm([]))
   const [rejectTarget, setRejectTarget] = useState<LeaveRequest | null>(null)
+  const [empCodeInput, setEmpCodeInput] = useState('')
 
   // Calendar state
   const [calYear, setCalYear] = useState(new Date().getFullYear())
@@ -301,12 +302,15 @@ export default function DonTuPage() {
   function openAdd() {
     setEditTarget(null)
     setForm(emptyForm(employees))
+    setEmpCodeInput('')
     setModalOpen(true)
   }
 
   function openEdit(l: LeaveRequest) {
     setEditTarget(l)
-    setForm({ ...l })
+    setForm({ ...l, leave_type: l.leave_type as LeaveType })
+    const emp = employees.find(e => e.employee_id === l.employee_id)
+    setEmpCodeInput(emp?.employee_code || '')
     setModalOpen(true)
   }
 
@@ -394,7 +398,7 @@ export default function DonTuPage() {
     <div className="flex-1 flex items-center justify-center">
       <div className="text-center">
         <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">sync</span>
-        <p className="mt-3 text-sm text-slate-500">Đang tải dữ liệu từ Excel…</p>
+        <p className="mt-3 text-sm text-slate-500">Đang cập nhật dữ liệu…</p>
       </div>
     </div>
   )
@@ -706,12 +710,29 @@ export default function DonTuPage() {
         size="md"
       >
         <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nhân viên *</label>
-            <select value={f.employee_id} onChange={e => setForm(p => ({ ...p, employee_id: e.target.value }))}
-              className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer">
-              {employees.map(e => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Mã NV (Tùy chọn)</label>
+              <input type="text" value={empCodeInput} 
+                placeholder="Nhập mã NV..."
+                onChange={e => {
+                  const val = e.target.value;
+                  setEmpCodeInput(val);
+                  const emp = employees.find(em => em.employee_code === val);
+                  if (emp) {
+                    setForm(p => ({ ...p, employee_id: emp.employee_id }));
+                  }
+                }}
+                className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nhân viên *</label>
+              <select value={f.employee_id} onChange={e => setForm(p => ({ ...p, employee_id: e.target.value }))}
+                disabled={employees.some(em => em.employee_code === empCodeInput)}
+                className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                {employees.map(e => <option key={e.employee_id} value={e.employee_id}>{e.full_name}</option>)}
+              </select>
+            </div>
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">Loại nghỉ *</label>
@@ -727,12 +748,16 @@ export default function DonTuPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">Từ ngày *</label>
-              <input type="date" value={f.from_date} onChange={e => setForm(p => ({ ...p, from_date: e.target.value }))}
+              <input type="date" value={f.from_date} 
+                min={!editTarget ? new Date().toISOString().slice(0, 10) : undefined}
+                onChange={e => setForm(p => ({ ...p, from_date: e.target.value }))}
                 className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">Đến ngày *</label>
-              <input type="date" value={f.to_date} onChange={e => setForm(p => ({ ...p, to_date: e.target.value }))}
+              <input type="date" value={f.to_date} 
+                min={f.from_date || (!editTarget ? new Date().toISOString().slice(0, 10) : undefined)}
+                onChange={e => setForm(p => ({ ...p, to_date: e.target.value }))}
                 className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50" />
             </div>
           </div>

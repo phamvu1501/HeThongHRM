@@ -84,7 +84,7 @@ export default function BangLuongPage() {
     <div className="flex-1 flex items-center justify-center">
       <div className="text-center">
         <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">sync</span>
-        <p className="mt-3 text-sm text-slate-500">Đang tải dữ liệu từ Excel…</p>
+        <p className="mt-3 text-sm text-slate-500">Đang cập nhật dữ liệu…</p>
       </div>
     </div>
   )
@@ -153,7 +153,7 @@ export default function BangLuongPage() {
         </div>
         <select value={monthFilter} onChange={e => setMonthFilter(e.target.value)}
           className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer">
-          {months.map(m => <option key={m} value={m}>{getMonthDisplay(m)}</option>)}
+          {months.map(m => <option key={m} value={m}>{getMonthDisplay(m || '')}</option>)}
         </select>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
           className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer">
@@ -243,7 +243,7 @@ export default function BangLuongPage() {
             <div className="p-5 space-y-1">
               <div className="mb-4">
                 <h4 className="font-bold text-slate-900">{selected.employee_name}</h4>
-                <p className="text-xs text-slate-500">{selected.department_name} · {getMonthDisplay(selected.month)}</p>
+                <p className="text-xs text-slate-500">{selected.department_name} · {getMonthDisplay(selected.month || '')}</p>
               </div>
 
               {[

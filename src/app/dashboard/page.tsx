@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { fetchData } from '@/lib/store'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 import { TopBar } from '@/components/TopBar'
-import { AttendanceBot } from '@/components/AttendanceBot'
+
 import { getAuth, AuthUser } from '@/lib/auth'
 import type { AppData } from '@/lib/types'
 
@@ -109,7 +109,8 @@ export default function DashboardPage() {
       // 8. Biến động lương (gom nhóm lịch sử lương)
       const monthMap = new Map<string, number>()
       payrolls.forEach(p => {
-         const m = p.month
+         const m = p.month || ''
+         if (!m) return
          if (!monthMap.has(m)) monthMap.set(m, 0)
          monthMap.set(m, monthMap.get(m)! + p.net_pay)
       })
@@ -522,7 +523,7 @@ export default function DashboardPage() {
             </div>
 
          </div>
-         <AttendanceBot abnormals={abnormalAttendances} duplicates={duplicates} />
+
       </div>
    )
 }

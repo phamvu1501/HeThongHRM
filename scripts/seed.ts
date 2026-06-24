@@ -56,9 +56,14 @@ async function main() {
   await prisma.systemLog.deleteMany()
   await prisma.systemSetting.deleteMany()
   await prisma.payroll.deleteMany()
+  await prisma.payrollPeriod.deleteMany()
   await prisma.adjustment.deleteMany()
   await prisma.leaveRequest.deleteMany()
+  await prisma.attendanceAlert.deleteMany()
   await prisma.attendance.deleteMany()
+  await prisma.salaryHistory.deleteMany()
+  await prisma.shiftAssignment.deleteMany()
+  await prisma.user.deleteMany()
   await prisma.employee.deleteMany()
   await prisma.department.deleteMany()
   await prisma.position.deleteMany()
@@ -120,6 +125,17 @@ async function main() {
     })
   }
 
+  // 2.5 Admin user (no employee)
+  await prisma.user.create({
+    data: {
+      username: 'admin',
+      password_hash: '123123',
+      role: 'ADMIN',
+      status: 'Active',
+      created_at: new Date().toISOString()
+    }
+  })
+
   // 3. Bơm Nhân viên (phụ thuộc Phòng ban, Chức vụ)
   console.log('Bơm dữ liệu Nhân viên...')
   for (const e of employees) {
@@ -148,6 +164,39 @@ async function main() {
           position_id: String(e.position_id)
         }
       })
+
+      // Generate User
+      await prisma.user.create({
+        data: {
+          username: String(e.employee_code),
+          password_hash: '123123',
+          role: 'EMPLOYEE',
+          status: 'Active',
+          created_at: new Date().toISOString(),
+          employee_id: String(e.employee_id)
+        }
+      })
+
+      // Generate SalaryHistory
+      await prisma.salaryHistory.create({
+        data: {
+          amount: Number(e.base_salary) || 0,
+          effective_from: String(e.join_date),
+          created_at: new Date().toISOString(),
+          employee_id: String(e.employee_id)
+        }
+      })
+
+      // Generate ShiftAssignment
+      const firstShift = shifts.length > 0 ? shifts[0].shift_id : 'S001'
+      await prisma.shiftAssignment.create({
+        data: {
+          effective_from: String(e.join_date),
+          created_at: new Date().toISOString(),
+          employee_id: String(e.employee_id),
+          shift_id: String(firstShift)
+        }
+      })
     } catch (err: any) {
       console.warn(`Bỏ qua nhân viên ${e.employee_id} do lỗi (thường là sai ID Phòng ban/Chức vụ)`)
     }
@@ -169,8 +218,10 @@ async function main() {
           work_date: String(a.work_date),
           check_in: String(a.check_in),
           check_out: String(a.check_out),
-          work_hours: Number(a.work_hours) || 0,
-          overtime_hours: Number(a.overtime_hours) || 0,
+          work_minutes: (Number(a.work_hours) || 0) * 60,
+          overtime_minutes: (Number(a.overtime_hours) || 0) * 60,
+          late_minutes: 0,
+          early_leave_minutes: 0,
           status: REVERSE_ATT[a.status] ?? 'Đúng giờ',
           note: String(a.note),
           employee_id: String(a.employee_id),
@@ -224,16 +275,35 @@ async function main() {
     } catch(err) {}
   }
 
+  // Payroll Periods
+  const uniqueMonths = Array.from(new Set(payrolls.map((p: any) => p.month).filter(Boolean)))
+  for (const m of uniqueMonths) {
+    const monthStr = String(m);
+    const periodId = `PRP_${monthStr.replace('-', '')}`
+    await prisma.payrollPeriod.create({
+      data: {
+        period_id: periodId,
+        month: monthStr.split('-')[1] || '01',
+        year: monthStr.split('-')[0] || '2026',
+        state: 'PAID',
+        created_at: new Date().toISOString()
+      }
+    })
+  }
+
   // Payrolls
   const REVERSE_PS: Record<string, string> = {
     'approved': 'Đã thanh toán', 'pending': 'Chưa thanh toán', 'processing': 'Đang xử lý',
   }
   for (const p of payrolls) {
+    if (!p.month) continue;
     try {
+      const periodId = `PRP_${String(p.month).replace('-', '')}`
       await prisma.payroll.create({
         data: {
           payroll_id: String(p.payroll_id),
-          month: String(p.month),
+          version: 1,
+          period_id: periodId,
           base_salary: Number(p.base_salary) || 0,
           work_days_standard: Number(p.work_days_standard) || 0,
           work_days_actual: Number(p.work_days_actual) || 0,
@@ -279,3 +349,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect()
   })
+

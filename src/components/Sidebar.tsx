@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { href: '/bang-luong', icon: 'payments', label: 'Bảng lương' },
   { href: '/phu-cap', icon: 'add_card', label: 'Phụ cấp & KT' },
   { href: '/danh-muc', icon: 'category', label: 'Danh mục' },
+  { href: '/canh-bao', icon: 'warning', label: 'Cảnh báo' },
   { href: '/nhat-ky', icon: 'history', label: 'Nhật ký' },
   { href: '/cai-dat', icon: 'settings', label: 'Cài đặt' },
 ]

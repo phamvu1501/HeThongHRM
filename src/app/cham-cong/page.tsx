@@ -21,15 +21,18 @@ function genId(prefix: string, list: { attendance_id: string }[]) {
 }
 
 function emptyForm(employees: Employee[], shifts: Shift[]) {
+  const s = shifts[0]
   return {
     attendance_id: '',
     work_date: new Date().toISOString().slice(0, 10),
     employee_id: employees[0]?.employee_id ?? '',
-    shift_id: shifts[0]?.shift_id ?? '',
-    check_in: '08:00',
-    check_out: '17:30',
-    work_hours: 8,
-    overtime_hours: 0,
+    shift_id: s?.shift_id ?? '',
+    check_in: s?.start_time ?? '08:00',
+    check_out: s?.end_time ?? '17:30',
+    work_minutes: (s?.work_hours || 8) * 60,
+    overtime_minutes: 0,
+    late_minutes: 0,
+    early_leave_minutes: 0,
     status: 'Đúng giờ' as AttendanceStatus,
     note: '',
     employee_name: '',
@@ -94,7 +97,7 @@ export default function ChamCongPage() {
   const late = filtered.filter(a => a.status === 'Đi trễ').length
   const overtime = filtered.filter(a => a.status === 'Tăng ca').length
   const absent = filtered.filter(a => a.status === 'Vắng mặt').length
-  const totalOTH = filtered.reduce((s, a) => s + a.overtime_hours, 0)
+  const totalOTH = filtered.reduce((s, a) => s + ((a.overtime_minutes || 0) / 60), 0)
 
   const months = useMemo(() => {
     return [...new Set(records.map(a => a.work_date.slice(0, 7)))].sort().reverse()
@@ -110,8 +113,13 @@ export default function ChamCongPage() {
     setEditTarget(att)
     setForm({ 
       ...att,
+      work_minutes: att.work_minutes || 0,
+      overtime_minutes: att.overtime_minutes || 0,
+      late_minutes: att.late_minutes || 0,
+      early_leave_minutes: att.early_leave_minutes || 0,
       employee_name: att.employee_name ?? '',
-      shift_name: att.shift_name ?? ''
+      shift_name: att.shift_name ?? '',
+      status: att.status as AttendanceStatus
     })
     setModalOpen(true)
   }
@@ -174,7 +182,7 @@ export default function ChamCongPage() {
     <div className="flex-1 flex items-center justify-center">
       <div className="text-center">
         <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">sync</span>
-        <p className="mt-3 text-sm text-slate-500">Đang tải dữ liệu từ Excel…</p>
+        <p className="mt-3 text-sm text-slate-500">Đang cập nhật dữ liệu…</p>
       </div>
     </div>
   )
@@ -193,7 +201,7 @@ export default function ChamCongPage() {
     <div className="flex flex-col h-full overflow-hidden">
       <TopBar
         title="Chấm công"
-        subtitle={`Theo dõi ${records.length} bản ghi từ file Excel`}
+        subtitle={`Theo dõi ${records.length} bản ghi từ DB`}
         actions={
           <button
             onClick={openAdd}
@@ -221,7 +229,7 @@ export default function ChamCongPage() {
           </div>
         ))}
         {saving && <span className="text-xs text-slate-400 flex items-center gap-1 ml-auto">
-          <span className="material-symbols-outlined text-[14px] animate-spin">sync</span>Đang lưu vào Excel…
+          <span className="material-symbols-outlined text-[14px] animate-spin">sync</span>Đang lưu…
         </span>}
       </div>
 
@@ -271,12 +279,12 @@ export default function ChamCongPage() {
                 <td className="px-3 py-3 text-center text-xs font-mono text-slate-700">{att.check_in || '—'}</td>
                 <td className="px-3 py-3 text-center text-xs font-mono text-slate-700">{att.check_out || '—'}</td>
                 <td className="px-3 py-3 text-center text-xs font-semibold text-slate-700">
-                  {att.work_hours > 0 ? `${att.work_hours}h` : '—'}
+                  {att.work_minutes ? `${(att.work_minutes / 60).toFixed(1)}h` : '—'}
                 </td>
                 <td className="px-3 py-3 text-center">
-                  {att.overtime_hours > 0
-                    ? <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#fefce8', color: '#713f12' }}>+{att.overtime_hours}h</span>
-                    : <span className="text-slate-300 text-xs">—</span>}
+                  {att.overtime_minutes ? (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#fefce8', color: '#713f12' }}>+{(att.overtime_minutes / 60).toFixed(1)}h</span>
+                  ) : <span className="text-slate-300 text-xs">—</span>}
                 </td>
                 <td className="px-3 py-3">
                   <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${getAttendanceStatusColor(att.status)}`}>
@@ -339,7 +347,19 @@ export default function ChamCongPage() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">Ca làm việc *</label>
-            <select value={f.shift_id} onChange={e => setForm(p => ({ ...p, shift_id: e.target.value }))}
+            <select value={f.shift_id} onChange={e => {
+              const sid = e.target.value;
+              const sh = shifts.find(s => s.shift_id === sid);
+              setForm(p => ({
+                ...p,
+                shift_id: sid,
+                ...(sh ? {
+                  check_in: sh.start_time,
+                  check_out: sh.end_time,
+                  work_minutes: (sh.work_hours || 8) * 60
+                } : {})
+              }));
+            }}
               className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50 cursor-pointer">
               {shifts.map(s => <option key={s.shift_id} value={s.shift_id}>{s.shift_name} ({s.start_time}–{s.end_time})</option>)}
             </select>
@@ -356,21 +376,21 @@ export default function ChamCongPage() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">Số giờ làm</label>
-            <input type="number" step="0.5" min="0" max="24" value={f.work_hours}
-              onChange={e => setForm(p => ({ ...p, work_hours: parseFloat(e.target.value) || 0 }))}
+            <input type="number" step="0.5" min="0" max="24" value={(f.work_minutes || 0) / 60}
+              onChange={e => setForm(p => ({ ...p, work_minutes: (parseFloat(e.target.value) || 0) * 60 }))}
               className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">Giờ tăng ca</label>
-            <input type="number" step="0.5" min="0" max="10" value={f.overtime_hours}
-              onChange={e => setForm(p => ({ ...p, overtime_hours: parseFloat(e.target.value) || 0 }))}
+            <input type="number" step="0.5" min="0" max="10" value={(f.overtime_minutes || 0) / 60}
+              onChange={e => setForm(p => ({ ...p, overtime_minutes: (parseFloat(e.target.value) || 0) * 60 }))}
               className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50" />
           </div>
           <div className="col-span-2">
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">Trạng thái *</label>
             <div className="flex flex-wrap gap-2">
               {STATUS_LIST.map(s => (
-                <button key={s} type="button" onClick={() => setForm(p => ({ ...p, status: s }))}
+                <button key={s} type="button" onClick={() => setForm(p => ({ ...p, status: s as AttendanceStatus }))}
                   className={`px-3 py-1.5 text-xs font-bold rounded-full border transition-all ${f.status === s ? 'border-transparent' : 'border-slate-200 text-slate-500 hover:border-slate-300'}`}
                   style={f.status === s ? { background: STATUS_DOT[s] + '25', borderColor: STATUS_DOT[s], color: STATUS_DOT[s] } : {}}>
                   {s}
