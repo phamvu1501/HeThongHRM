@@ -1,38 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import * as XLSX from 'xlsx'
-import * as path from 'path'
-import * as fs from 'fs'
+import { PrismaClient } from '@prisma/client'
 
-const EXCEL_PATH = path.resolve(process.cwd(), 'HRM_mini_vn_2025-2026.xlsx')
-const SHEET = 'nhat-ky'
+const prisma = new PrismaClient()
 
-function readSheet<T = Record<string, unknown>>(wb: XLSX.WorkBook, sheetName: string): T[] {
-  const ws = wb.Sheets[sheetName]
-  if (!ws) return []
-  return XLSX.utils.sheet_to_json<T>(ws, { defval: '' })
-}
-
-function writeSheet(wb: XLSX.WorkBook, sheetName: string, rows: Record<string, unknown>[]) {
-  if (rows.length === 0) {
-    const ws = wb.Sheets[sheetName]
-    if (!ws) return
-    const ref = ws['!ref']
-    if (!ref) return
-    const range = XLSX.utils.decode_range(ref)
-    for (let R = 1; R <= range.e.r; R++) {
-      for (let C = range.s.c; C <= range.e.c; C++) {
-        delete ws[XLSX.utils.encode_cell({ r: R, c: C })]
-      }
-    }
-    ws['!ref'] = XLSX.utils.encode_range({ s: range.s, e: { r: 0, c: range.e.c } })
-    return
-  }
-  const ws = XLSX.utils.json_to_sheet(rows)
-  wb.Sheets[sheetName] = ws
-  if (!wb.SheetNames.includes(sheetName)) {
-    wb.SheetNames.push(sheetName)
-  }
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,34 +14,33 @@ export async function POST(req: NextRequest) {
       description: string
     }
 
-    if (!fs.existsSync(EXCEL_PATH)) {
-      return NextResponse.json(
-        { error: `Không tìm thấy file Excel tại: ${EXCEL_PATH}` },
-        { status: 500 }
-      )
+    // Generate new ID using Prisma aggregate
+    const lastLog = await prisma.systemLog.findFirst({
+      orderBy: { log_id: 'desc' }
+    })
+    
+    let nextNum = 1
+    if (lastLog) {
+      const match = lastLog.log_id.match(/\d+/)
+      if (match) {
+        nextNum = parseInt(match[0]) + 1
+      }
     }
+    const newId = `LOG-${String(nextNum).padStart(6, '0')}`
+    const logTime = new Date().toISOString().replace('T', ' ').slice(0, 19)
 
-    const wb = XLSX.readFile(EXCEL_PATH)
-    const existing = readSheet<any>(wb, SHEET)
-
-    // Tạo ID mới
-    const nums = existing.map((r: any) => parseInt(String(r.log_id ?? '').replace(/\D/g, '') || '0'))
-    const newId = `LOG-${String(Math.max(0, ...nums) + 1).padStart(6, '0')}`
-
-    const newRow = {
-      log_id: newId,
-      log_time: new Date().toISOString().replace('T', ' ').slice(0, 19),
-      user: body.user ?? 'admin',
-      action: body.action,
-      entity_type: body.entity_type,
-      entity_id: body.entity_id,
-      description: body.description,
-    }
-
-    existing.push(newRow)
-
-    writeSheet(wb, SHEET, existing)
-    XLSX.writeFile(wb, EXCEL_PATH)
+    // 1. Lưu Postgres
+    await prisma.systemLog.create({
+      data: {
+        log_id: newId,
+        log_time: logTime,
+        user: body.user ?? 'admin',
+        action: body.action,
+        entity_type: body.entity_type,
+        entity_id: body.entity_id,
+        description: body.description,
+      }
+    })
 
     return NextResponse.json({ ok: true, log_id: newId })
   } catch (err: any) {

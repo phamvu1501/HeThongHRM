@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model Department {
+  department_id   String     @id
+  department_name String
+  cost_center     String
+  manager_emp_id  String
+  status          String     @default("Active")
+  created_at      String
+
+  employees       Employee[]
+}
+
+model Position {
+  position_id     String     @id
+  position_name   String
+  level           String
+  salary_band_min Float
+  salary_band_max Float
+  status          String     @default("Active")
+
+  employees       Employee[]
+}
+
+model Employee {
+  employee_id     String     @id
+  employee_code   String     @unique
+  full_name       String
+  gender          String
+  dob             String
+  phone           String
+  email           String
+  address         String
+  join_date       String
+  contract_type   String
+  base_salary     Float
+  bank_account_no String
+  status          String     @default("Active")
+  created_at      String
+
+  department_id   String
+  department      Department @relation(fields: [department_id], references: [department_id])
+
+  position_id     String
+  position        Position   @relation(fields: [position_id], references: [position_id])
+
+  attendances     Attendance[]
+  leaveRequests   LeaveRequest[]
+  adjustments     Adjustment[]
+  payrolls        Payroll[]
+}
+
+model Shift {
+  shift_id        String     @id
+  shift_name      String
+  start_time      String
+  end_time        String
+  break_min       Int
+  work_hours      Float
+  status          String     @default("Active")
+
+  attendances     Attendance[]
+}
+
+model Attendance {
+  attendance_id   String     @id
+  work_date       String
+  check_in        String
+  check_out       String
+  work_hours      Float
+  overtime_hours  Float
+  status          String
+  note            String
+
+  employee_id     String
+  employee        Employee   @relation(fields: [employee_id], references: [employee_id])
+
+  shift_id        String
+  shift           Shift      @relation(fields: [shift_id], references: [shift_id])
+}
+
+model LeaveRequest {
+  leave_id        String     @id
+  leave_type      String
+  from_date       String
+  to_date         String
+  days            Float
+  reason          String
+  status          String
+  approved_by     String
+  created_at      String
+
+  employee_id     String
+  employee        Employee   @relation(fields: [employee_id], references: [employee_id])
+}
+
+model Adjustment {
+  adj_id          String     @id
+  month           String
+  adj_type        String
+  amount          Float
+  description     String
+  created_at      String
+
+  employee_id     String
+  employee        Employee   @relation(fields: [employee_id], references: [employee_id])
+}
+
+model Payroll {
+  payroll_id         String     @id
+  month              String
+  base_salary        Float
+  work_days_standard Float
+  work_days_actual   Float
+  overtime_hours     Float
+  overtime_pay       Float
+  allowance          Float
+  deduction          Float
+  gross_pay          Float
+  insurance          Float
+  pit                Float
+  net_pay            Float
+  pay_date           String
+  status             String
+
+  employee_id        String
+  employee           Employee   @relation(fields: [employee_id], references: [employee_id])
+}
+
+model SystemSetting {
+  setting_id    String @id
+  setting_key   String @unique
+  setting_value String
+  setting_type  String
+  description   String
+  updated_at    String
+}
+
+model SystemLog {
+  log_id      String @id
+  log_time    String
+  user        String
+  action      String
+  entity_type String
+  entity_id   String
+  description String
+}
+
+model EnumValue {
+  id              Int     @id @default(autoincrement())
+  enum_group      String
+  enum_value      String
+  display_name_vi String
+  color_code      String
+  sort_order      Int
+  is_active       Boolean
+}
