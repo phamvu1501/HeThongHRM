@@ -172,11 +172,11 @@ export default function BangLuongPage() {
               <tr className="text-slate-500 text-xs font-semibold uppercase tracking-wider">
                 <th className="text-left px-5 py-3">Nhân viên</th>
                 <th className="text-left px-3 py-3">Phòng ban</th>
-                <th className="text-right px-3 py-3">Lương CB</th>
+                <th className="text-right px-3 py-3">Lương cơ bản</th>
                 <th className="text-right px-3 py-3">Phụ cấp</th>
                 <th className="text-right px-3 py-3">OT</th>
                 <th className="text-right px-3 py-3">Gross</th>
-                <th className="text-right px-3 py-3">BH/Thuế</th>
+                <th className="text-right px-3 py-3">Bảo hiểm / Thuế</th>
                 <th className="text-right px-5 py-3 font-black text-slate-800">Net</th>
                 <th className="text-left px-3 py-3">Trạng thái</th>
                 {auth?.role === 'ADMIN' && <th className="px-3 py-3"></th>}

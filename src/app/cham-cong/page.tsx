@@ -58,7 +58,7 @@ export default function ChamCongPage() {
   const [deleteTarget, setDeleteTarget] = useState<Attendance | null>(null)
   const [form, setForm] = useState(() => emptyForm([], []))
 
-  // ── Load data from Excel ──
+  // ── Load data from Database ──
   useEffect(() => {
     setLoading(true)
     const authData = getAuth()
@@ -145,7 +145,7 @@ export default function ChamCongPage() {
     try {
       await saveAttendances(next)
       setRecords(next)
-      // Ghi nhật ký vào Excel
+      // Ghi nhật ký vào Database
       logActivity(
         editTarget ? 'UPDATE' : 'CREATE',
         'cham-cong',

@@ -1,6 +1,6 @@
 /**
  * HRM - Store v2
- * Đọc/ghi dữ liệu trực tiếp từ file Excel thông qua API route /api/data.
+ * Đọc/ghi dữ liệu trực tiếp từ PostgreSQL thông qua API route /api/data.
  * Dùng localStorage làm cache để tránh gọi API liên tục.
  */
 
@@ -44,7 +44,7 @@ function clearCache() {
 
 // ── API calls ─────────────────────────────────────────────────────────────────
 
-/** Lấy toàn bộ dữ liệu từ Excel (có cache 60s) */
+/** Lấy toàn bộ dữ liệu từ Cơ sở dữ liệu (có cache 60s) */
 export async function fetchData(forceRefresh = false): Promise<AppData> {
   if (!forceRefresh) {
     const cached = readCache()
@@ -57,7 +57,7 @@ export async function fetchData(forceRefresh = false): Promise<AppData> {
   return data
 }
 
-/** Ghi 1 slice dữ liệu (1 sheet) vào Excel */
+/** Ghi 1 slice dữ liệu (1 bảng) vào Cơ sở dữ liệu */
 async function saveSheet(sheet: string, rows: unknown[]) {
   clearCache() // invalidate cache
   const res = await fetch('/api/data', {
@@ -90,7 +90,7 @@ export type LogAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'APPROVE' | 'REJECT' | 
 export type EntityType = 'nhan-vien' | 'cham-cong' | 'don-xin-nghi' | 'phu-cap-khau-tru' | 'bang-luong' | 'phong-ban' | 'chuc-vu' | 'ca-lam-viec' | 'bang-gia-tri' | 'cai-dat'
 
 /**
- * Ghi 1 dòng nhật ký vào sheet nhat-ky trong Excel.
+ * Ghi 1 dòng nhật ký vào database.
  * Fire-and-forget — không cần await, không chặn luồng chính.
  */
 export function logActivity(

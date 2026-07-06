@@ -36,7 +36,7 @@ export default function CaiDatPage() {
     employees: 0, attendances: 0, leaveRequests: 0, adjustments: 0, payrolls: 0, storageKb: 0,
   })
 
-  // ---- LOAD EXCEL DATA ----
+  // ---- LOAD DATABASE DATA ----
   useEffect(() => {
     fetchData().then(d => {
       setSettings(d.settings || [])
@@ -178,7 +178,7 @@ export default function CaiDatPage() {
           <div className="max-w-2xl space-y-4">
             {currentSettings.length === 0 && (
               <div className="p-8 text-center text-slate-500 text-sm border border-slate-200 rounded-xl bg-slate-50">
-                Không tìm thấy tham số cài đặt. Hãy kiểm tra sheet `cai-dat` trong file Excel!
+                Không tìm thấy tham số cài đặt. Hãy kiểm tra lại cơ sở dữ liệu!
               </div>
             )}
             {currentSettings.map(s => (
@@ -214,7 +214,7 @@ export default function CaiDatPage() {
                   { label: 'Phiên bản ứng dụng', val: 'HRM v2026.1.0' },
                   { label: 'Framework', val: 'Next.js 15 · React 19' },
                   { label: 'Môi trường', val: 'Development' },
-                  { label: 'Cơ sở dữ liệu', val: 'Excel (Local)' },
+                  { label: 'Cơ sở dữ liệu', val: 'PostgreSQL (Supabase)' },
                 ].map(i => (
                   <div key={i.label}>
                     <p className="text-slate-400">{i.label}</p>

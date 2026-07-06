@@ -83,7 +83,7 @@ export default function NhatKyPage() {
     <div className="flex-1 flex items-center justify-center">
       <div className="text-center">
         <span className="material-symbols-outlined text-4xl text-slate-300 animate-spin">sync</span>
-        <p className="mt-3 text-sm text-slate-500">Đang tải nhật ký từ Excel…</p>
+        <p className="mt-3 text-sm text-slate-500">Đang cập nhật dữ liệu…</p>
       </div>
     </div>
   )

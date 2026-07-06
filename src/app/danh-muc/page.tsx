@@ -60,7 +60,7 @@ export default function DanhMucPage() {
       setLoading(false)
     }).catch(err => {
       console.error(err)
-      setErrorMsg('Lỗi khi tải dữ liệu từ Excel.')
+      setErrorMsg('Lỗi khi tải dữ liệu từ server.')
       setLoading(false)
     })
   }, [])

@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { getInitials, getAvatarColor } from '@/lib/utils'
-import { loadData } from '@/lib/store'
+import { loadData, fetchData } from '@/lib/store'
 import { exportAllData } from '@/lib/excel'
 import { useEffect, useState } from 'react'
 import { getAuth, AuthUser } from '@/lib/auth'
@@ -24,21 +24,42 @@ export function Sidebar() {
   const pathname = usePathname()
   const [auth, setAuth] = useState<AuthUser | null>(null)
   const [currentUser, setCurrentUser] = useState({ name: 'Đang tải...', role: '...' })
+  const [hasAlertToday, setHasAlertToday] = useState(false)
 
   useEffect(() => {
     const authData = getAuth()
     setAuth(authData)
-    if (authData?.role === 'ADMIN') {
-      setCurrentUser({ name: 'Admin Quản trị', role: 'Quản trị hệ thống' })
-    } else if (authData?.role === 'EMPLOYEE' && authData.empId) {
-       const data = loadData() // From cache
-       const emp = data.employees.find(e => e.employee_id === authData.empId)
-       if (emp) {
-         setCurrentUser({ name: emp.full_name, role: emp.position_name || 'Nhân viên' })
-       } else {
-         setCurrentUser({ name: authData.empId, role: 'Nhân viên' })
-       }
-    }
+    
+    fetchData().then(data => {
+      if (authData?.role === 'ADMIN') {
+        setCurrentUser({ name: 'Admin Quản trị', role: 'Quản trị hệ thống' })
+      } else if (authData?.role === 'EMPLOYEE' && authData.empId) {
+         const emp = data.employees.find(e => e.employee_id === authData.empId)
+         if (emp) {
+           setCurrentUser({ name: emp.full_name, role: emp.position_name || 'Nhân viên' })
+         } else {
+           setCurrentUser({ name: authData.empId, role: 'Nhân viên' })
+         }
+      }
+
+      // Check for alerts today
+      const today = new Date()
+      const yyyy = today.getFullYear()
+      const mm = String(today.getMonth() + 1).padStart(2, '0')
+      const dd = String(today.getDate()).padStart(2, '0')
+      const todayStr = `${yyyy}-${mm}-${dd}`
+
+      const attToday = data.attendances.filter(a => {
+        let wDate = a.work_date;
+        if (wDate.includes('/')) {
+           const parts = wDate.split('/');
+           if (parts.length === 3) wDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return wDate === todayStr;
+      })
+      const hasAbnormal = attToday.some(a => ['Đi trễ', 'Về sớm', 'Vắng mặt', 'MISSING_CHECKOUT', 'LATE'].includes(a.status))
+      setHasAlertToday(hasAbnormal)
+    }).catch(console.error)
   }, [pathname]) // re-run if needed, but mostly runs on mount
 
   function handleLogout() {
@@ -98,18 +119,32 @@ export function Sidebar() {
                 transition-all duration-150 cursor-pointer group
                 ${isActive
                   ? 'text-slate-900 shadow-sm'
+                  : item.href === '/canh-bao' && hasAlertToday
+                  ? 'text-red-600 bg-red-50/60 hover:bg-red-50'
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 }
               `}
               style={isActive ? { background: '#bde619', fontWeight: 600 } : {}}
             >
-              <span
-                className={`material-symbols-outlined text-[20px] transition-colors ${isActive ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-700'
+              <div className="relative flex items-center justify-center">
+                <span
+                  className={`material-symbols-outlined text-[20px] transition-colors ${
+                    item.href === '/canh-bao' && hasAlertToday ? 'text-red-600 animate-pulse' :
+                    isActive ? 'text-slate-900' : 'text-slate-500 group-hover:text-slate-700'
                   }`}
-              >
-                {item.icon}
+                >
+                  {item.icon}
+                </span>
+                {item.href === '/canh-bao' && hasAlertToday && (
+                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                  </span>
+                )}
+              </div>
+              <span className={item.href === '/canh-bao' && hasAlertToday ? 'font-bold' : ''}>
+                {item.label}
               </span>
-              {item.label}
             </Link>
           )
         })}

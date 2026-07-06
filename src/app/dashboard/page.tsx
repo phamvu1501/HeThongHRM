@@ -44,7 +44,7 @@ export default function DashboardPage() {
       const totalEmp = activeEmp.length
 
       // 2. Đi làm hôm nay (tính tỉ lệ đúng giờ)
-      // Lưu ý: Nếu dữ liệu trong Excel lưu là DD/MM/YYYY thì sẽ không khớp với todayStr (YYYY-MM-DD).
+      // Lưu ý: Đảm bảo dữ liệu lưu đúng định dạng YYYY-MM-DD.
       // Ta chuẩn hóa work_date về YYYY-MM-DD để so sánh.
       const attToday = attendances.filter(a => {
          let wDate = a.work_date;
@@ -163,7 +163,7 @@ export default function DashboardPage() {
                   <span className="material-symbols-outlined text-4xl text-primary animate-spin">data_usage</span>
                </div>
                <p className="text-sm font-bold text-slate-800">Đang phân tích dữ liệu...</p>
-               <p className="text-xs text-slate-500 mt-1">Đọc trực tiếp từ file Excel HRM</p>
+               <p className="text-xs text-slate-500 mt-1">Đọc trực tiếp từ PostgreSQL</p>
             </div>
          </div>
       )
@@ -434,7 +434,7 @@ export default function DashboardPage() {
                      )}
                   </div>
                   <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
-                     <a href="/don-tu" className="text-xs font-bold text-primary hover:underline">Xem lịch chi tiết 👉</a>
+                     <a href="/don-tu" className="text-xs font-bold text-primary hover:underline">Xem lịch chi tiết</a>
                   </div>
                </div>
 
