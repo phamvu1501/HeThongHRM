@@ -4,8 +4,8 @@
 
 export type Status = 'Active' | 'Inactive'
 export type ContractType = 'Full-time' | 'Part-time' | 'Probation' | 'Contract'
-export type Gender = 'Nam' | 'Nữ' | 'Khác'
-export type AttendanceStatus = 'Đúng giờ' | 'Đi trễ' | 'Về sớm' | 'Vắng mặt' | 'Tăng ca' | 'Nghỉ phép' | 'MISSING_CHECKOUT' | 'LEAVE_APPROVED' | 'ABSENT' | 'LATE' | 'ON_TIME'
+export type Gender = 'Nam' | 'Nữ'
+export type AttendanceStatus = 'Đúng giờ' | 'Đi trễ' | 'Về sớm' | 'Đi trễ & Về sớm' | 'Thiếu check-out' | 'Thiếu check-in' | 'Vắng mặt' | 'Tăng ca' | 'Nghỉ phép' | 'MISSING_CHECKOUT' | 'LEAVE_APPROVED' | 'ABSENT' | 'LATE' | 'ON_TIME'
 export type LeaveStatus = 'Chờ duyệt' | 'Đã duyệt' | 'Từ chối' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED'
 export type LeaveType = 'Nghỉ phép năm' | 'Nghỉ ốm' | 'Nghỉ không lương' | 'Nghỉ chế độ' | 'Việc riêng'
 export type PayrollStatus = 'Chưa thanh toán' | 'Đã thanh toán' | 'Đang xử lý'
@@ -136,6 +136,7 @@ export interface Attendance {
   early_leave_minutes?: number | null
   status: AttendanceStatus | string
   note: string
+  checked_by?: string | null
   // computed
   employee_name?: string
   shift_name?: string

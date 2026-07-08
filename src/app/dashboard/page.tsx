@@ -74,7 +74,10 @@ export default function DashboardPage() {
       })
 
       // 3. Đơn chờ duyệt
-      const pendingLeaves = leaveRequests.filter(l => l.status === 'Chờ duyệt')
+      let pendingLeaves = leaveRequests.filter(l => l.status === 'Chờ duyệt')
+      if (auth?.role === 'EMPLOYEE' && auth.empId) {
+         pendingLeaves = pendingLeaves.filter(l => l.employee_id === auth.empId)
+      }
 
       // 4. Lương tháng này
       const currentMonthStr = todayStr.substring(0, 7) // '2026-06'
@@ -152,7 +155,7 @@ export default function DashboardPage() {
          abnormalAttendances,
          duplicates
       }
-   }, [data])
+   }, [data, auth])
 
    if (loading || !stats) {
       return (

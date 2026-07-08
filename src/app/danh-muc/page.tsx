@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { fetchData, saveDepartments, savePositions, saveShifts, logActivity } from '@/lib/store'
+import { showToast } from '@/components/Toast'
 import { TopBar } from '@/components/TopBar'
 import { Modal } from '@/components/Modal'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
@@ -77,7 +78,7 @@ export default function DanhMucPage() {
     setModalOpen(true)
   }
   async function saveDept() {
-    if (!deptForm.department_name.trim()) return alert('Vui lòng nhập tên phòng ban')
+    if (!deptForm.department_name.trim()) return showToast('Vui lòng nhập tên phòng ban', 'warning')
     setSaving(true)
     setErrorMsg('')
     try {
@@ -96,10 +97,12 @@ export default function DanhMucPage() {
       }
       await saveDepartments(newData)
       setDepts(newData)
+      showToast(deptEdit ? 'Cập nhật phòng ban thành công!' : 'Thêm mới phòng ban thành công!', 'success')
       setModalOpen(false)
       logActivity(actionName as any, 'phong-ban', id, `${actionName === 'CREATE' ? 'Tạo' : 'Cập nhật'} phòng ban: ${deptForm.department_name}`)
     } catch (e: any) {
       setErrorMsg(e.message)
+      showToast('Lỗi: ' + e.message, 'error')
     } finally {
       setSaving(false)
     }
@@ -117,7 +120,7 @@ export default function DanhMucPage() {
     setModalOpen(true)
   }
   async function savePos() {
-    if (!posForm.position_name.trim()) return alert('Vui lòng nhập tên chức vụ')
+    if (!posForm.position_name.trim()) return showToast('Vui lòng nhập tên chức vụ', 'warning')
     setSaving(true)
     setErrorMsg('')
     try {
@@ -135,10 +138,12 @@ export default function DanhMucPage() {
       }
       await savePositions(newData)
       setPositions(newData)
+      showToast(posEdit ? 'Cập nhật chức vụ thành công!' : 'Thêm mới chức vụ thành công!', 'success')
       setModalOpen(false)
       logActivity(actionName as any, 'chuc-vu', id, `${actionName === 'CREATE' ? 'Tạo' : 'Cập nhật'} chức vụ: ${posForm.position_name} (${posForm.level})`)
     } catch (e: any) {
       setErrorMsg(e.message)
+      showToast('Lỗi: ' + e.message, 'error')
     } finally {
       setSaving(false)
     }
@@ -156,7 +161,7 @@ export default function DanhMucPage() {
     setModalOpen(true)
   }
   async function saveShift() {
-    if (!shiftForm.shift_name.trim()) return alert('Vui lòng nhập tên ca')
+    if (!shiftForm.shift_name.trim()) return showToast('Vui lòng nhập tên ca làm việc', 'warning')
     setSaving(true)
     setErrorMsg('')
     try {
@@ -174,10 +179,12 @@ export default function DanhMucPage() {
       }
       await saveShifts(newData)
       setShifts(newData)
+      showToast(shiftEdit ? 'Cập nhật ca làm việc thành công!' : 'Thêm mới ca làm việc thành công!', 'success')
       setModalOpen(false)
       logActivity(actionName as any, 'ca-lam-viec', id, `${actionName === 'CREATE' ? 'Tạo' : 'Cập nhật'} ca làm việc: ${shiftForm.shift_name}`)
     } catch (e: any) {
       setErrorMsg(e.message)
+      showToast('Lỗi: ' + e.message, 'error')
     } finally {
       setSaving(false)
     }
@@ -190,7 +197,7 @@ export default function DanhMucPage() {
     if (deleteTarget.type === 'Phòng ban') {
       const hasEmps = employees.some(e => e.department_id === deleteTarget.id)
       if (hasEmps) {
-        setErrorMsg(`Không thể xóa phòng ban "${deleteTarget.name}" vì vẫn còn nhân viên thuộc phòng ban này.`)
+        showToast(`Không thể xóa phòng ban "${deleteTarget.name}" vì vẫn còn nhân viên thuộc phòng ban này.`, 'warning')
         setDeleteTarget(null)
         return
       }
@@ -215,9 +222,11 @@ export default function DanhMucPage() {
         setShifts(newData)
         logActivity('DELETE', 'ca-lam-viec', deleteTarget.id, `Xóa ca làm việc: ${deleteTarget.name}`)
       }
+      showToast(`Xóa ${deleteTarget.type.toLowerCase()} thành công!`, 'success')
       setDeleteTarget(null)
     } catch (e: any) {
       setErrorMsg(e.message)
+      showToast('Lỗi xóa: ' + e.message, 'error')
     } finally {
       setSaving(false)
     }

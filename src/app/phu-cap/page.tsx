@@ -1,6 +1,7 @@
 'use client'
 import { useState, useMemo, useEffect } from 'react'
 import { fetchData, saveAdjustments, logActivity } from '@/lib/store'
+import { showToast } from '@/components/Toast'
 import { exportAdjustments } from '@/lib/excel'
 import { formatCurrency, formatDate, getMonthDisplay } from '@/lib/utils'
 import { TopBar } from '@/components/TopBar'
@@ -146,6 +147,7 @@ export default function PhuCapPage() {
     try {
       await saveAdjustments(next)
       setRecords(next)
+      showToast(editTarget ? 'Cập nhật phụ cấp/khấu trừ thành công!' : 'Thêm phụ cấp/khấu trừ thành công!', 'success')
       logActivity(
         editTarget ? 'UPDATE' : 'CREATE',
         'phu-cap-khau-tru',
@@ -155,8 +157,11 @@ export default function PhuCapPage() {
           : `Thêm phụ cấp/KT ${record.adj_type} cho ${record.employee_name}`
       )
       setModalOpen(false)
-    } catch (err: any) { alert('Lỗi lưu: ' + err.message) }
-    finally { setSaving(false) }
+    } catch (err: any) {
+      showToast('Lỗi lưu: ' + err.message, 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function handleDelete(adj: Adjustment) {
@@ -165,9 +170,13 @@ export default function PhuCapPage() {
     try {
       await saveAdjustments(next)
       setRecords(next)
+      showToast('Xóa phụ cấp/khấu trừ thành công!', 'success')
       logActivity('DELETE', 'phu-cap-khau-tru', adj.adj_id, `Xóa khoản ${adj.adj_type} của ${adj.employee_name}`)
-    } catch (err: any) { alert('Lỗi xóa: ' + err.message) }
-    finally { setSaving(false) }
+    } catch (err: any) {
+      showToast('Lỗi xóa: ' + err.message, 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const f = form

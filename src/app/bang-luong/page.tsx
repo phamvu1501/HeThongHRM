@@ -1,6 +1,7 @@
 'use client'
 import { useState, useMemo, useEffect } from 'react'
 import { fetchData, savePayrolls, logActivity } from '@/lib/store'
+import { showToast } from '@/components/Toast'
 import { formatCurrency, getPayrollStatusColor, getMonthDisplay } from '@/lib/utils'
 import { TopBar } from '@/components/TopBar'
 import { exportPayrolls } from '@/lib/excel'
@@ -58,10 +59,14 @@ export default function BangLuongPage() {
     try {
       await savePayrolls(next)
       setPayrolls(next)
+      showToast('Thanh toán lương thành công!', 'success')
       if (selected?.payroll_id === payroll.payroll_id) setSelected(updated)
       logActivity('APPROVE', 'bang-luong', payroll.payroll_id, `Thanh toán lương tháng ${payroll.month} cho ${payroll.employee_name}`)
-    } catch (err: any) { alert('Lỗi: ' + err.message) }
-    finally { setSaving(false) }
+    } catch (err: any) {
+      showToast('Lỗi: ' + err.message, 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function handleMarkAllPaid() {
@@ -74,10 +79,14 @@ export default function BangLuongPage() {
     try {
       await savePayrolls(next)
       setPayrolls(next)
+      showToast('Thanh toán tất cả lương trong tháng thành công!', 'success')
       setSelected(null)
       logActivity('APPROVE', 'bang-luong', 'ALL', `Thanh toán tất cả lương tháng ${monthFilter}`)
-    } catch (err: any) { alert('Lỗi: ' + err.message) }
-    finally { setSaving(false) }
+    } catch (err: any) {
+      showToast('Lỗi: ' + err.message, 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) return (

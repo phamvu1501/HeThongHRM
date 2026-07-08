@@ -1,6 +1,7 @@
 'use client'
 import { useState, useMemo, useEffect } from 'react'
 import { fetchData, saveLeaveRequests, logActivity } from '@/lib/store'
+import { showToast } from '@/components/Toast'
 import { exportLeaveRequests } from '@/lib/excel'
 import { formatDate, getLeaveStatusColor } from '@/lib/utils'
 import { getAuth, AuthUser } from '@/lib/auth'
@@ -273,7 +274,6 @@ export default function DonTuPage() {
 
       if (authData?.role === 'EMPLOYEE' && authData.empId) {
         activeEmps = activeEmps.filter(e => e.employee_id === authData.empId)
-        leaveData = leaveData.filter(l => l.employee_id === authData.empId)
       }
 
       const map = Object.fromEntries(data.employees.map(e => [e.employee_id, e.full_name]))
@@ -289,15 +289,22 @@ export default function DonTuPage() {
     }).catch(err => { setError(err.message); setLoading(false) })
   }, [])
 
-  const filtered = useMemo(() => records.filter(l => {
+  const employeeRecords = useMemo(() => {
+    if (auth?.role === 'EMPLOYEE' && auth.empId) {
+      return records.filter(l => l.employee_id === auth.empId)
+    }
+    return records
+  }, [records, auth])
+
+  const filtered = useMemo(() => employeeRecords.filter(l => {
     const matchStatus = statusFilter === 'all' || l.status === statusFilter
     const matchEmp = empFilter === 'all' || l.employee_id === empFilter
     return matchStatus && matchEmp
-  }).sort((a, b) => b.created_at.localeCompare(a.created_at)), [records, statusFilter, empFilter])
+  }).sort((a, b) => b.created_at.localeCompare(a.created_at)), [employeeRecords, statusFilter, empFilter])
 
-  const pending = records.filter(l => l.status === 'Chờ duyệt').length
-  const approved = records.filter(l => l.status === 'Đã duyệt').length
-  const rejected = records.filter(l => l.status === 'Từ chối').length
+  const pending = employeeRecords.filter(l => l.status === 'Chờ duyệt').length
+  const approved = employeeRecords.filter(l => l.status === 'Đã duyệt').length
+  const rejected = employeeRecords.filter(l => l.status === 'Từ chối').length
 
   function openAdd() {
     setEditTarget(null)
@@ -340,6 +347,7 @@ export default function DonTuPage() {
     try {
       await saveLeaveRequests(next)
       setRecords(next)
+      showToast(editTarget ? 'Cập nhật đơn xin nghỉ thành công!' : 'Tạo đơn xin nghỉ thành công!', 'success')
       if (selected?.leave_id === editTarget?.leave_id) setSelected(record)
       logActivity(
         editTarget ? 'UPDATE' : 'CREATE',
@@ -350,8 +358,11 @@ export default function DonTuPage() {
           : `Tạo đơn ${record.leave_type} của ${record.employee_name} (${record.days} ngày)`
       )
       setModalOpen(false)
-    } catch (err: any) { alert('Lỗi lưu: ' + err.message) }
-    finally { setSaving(false) }
+    } catch (err: any) {
+      showToast('Lỗi lưu: ' + err.message, 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function handleApprove(leave: LeaveRequest) {
@@ -361,10 +372,14 @@ export default function DonTuPage() {
     try {
       await saveLeaveRequests(next)
       setRecords(next)
+      showToast('Duyệt đơn xin nghỉ thành công!', 'success')
       if (selected?.leave_id === leave.leave_id) setSelected(updated)
       logActivity('APPROVE', 'don-xin-nghi', leave.leave_id, `Duyệt đơn ${leave.leave_type} của ${leave.employee_name}`)
-    } catch (err: any) { alert('Lỗi: ' + err.message) }
-    finally { setSaving(false) }
+    } catch (err: any) {
+      showToast('Lỗi duyệt: ' + err.message, 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function handleReject(leave: LeaveRequest) {
@@ -374,10 +389,14 @@ export default function DonTuPage() {
     try {
       await saveLeaveRequests(next)
       setRecords(next)
+      showToast('Từ chối đơn xin nghỉ thành công!', 'success')
       if (selected?.leave_id === leave.leave_id) setSelected(updated)
       logActivity('REJECT', 'don-xin-nghi', leave.leave_id, `Từ chối đơn ${leave.leave_type} của ${leave.employee_name}`)
-    } catch (err: any) { alert('Lỗi: ' + err.message) }
-    finally { setSaving(false) }
+    } catch (err: any) {
+      showToast('Lỗi: ' + err.message, 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   async function handleDelete(leave: LeaveRequest) {
@@ -386,10 +405,14 @@ export default function DonTuPage() {
     try {
       await saveLeaveRequests(next)
       setRecords(next)
+      showToast('Xóa đơn xin nghỉ thành công!', 'success')
       if (selected?.leave_id === leave.leave_id) setSelected(null)
       logActivity('DELETE', 'don-xin-nghi', leave.leave_id, `Xóa đơn ${leave.leave_type} của ${leave.employee_name}`)
-    } catch (err: any) { alert('Lỗi xóa: ' + err.message) }
-    finally { setSaving(false) }
+    } catch (err: any) {
+      showToast('Lỗi xóa: ' + err.message, 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const f = form
@@ -620,7 +643,7 @@ export default function DonTuPage() {
       {viewMode === 'calendar' && (
         <div className="flex-1 overflow-hidden">
           <CalendarView
-            records={records}
+            records={employeeRecords}
             calYear={calYear} calMonth={calMonth}
             setCalYear={setCalYear} setCalMonth={setCalMonth}
             empFilter={empFilter} statusFilter={statusFilter}

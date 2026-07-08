@@ -1,6 +1,7 @@
 'use client'
 import { useState, useMemo, useEffect } from 'react'
 import { fetchData, saveEmployees, logActivity } from '@/lib/store'
+import { showToast } from '@/components/Toast'
 import { exportEmployees } from '@/lib/excel'
 import { formatDate, formatCurrency, getInitials, getAvatarColor, getStatusColor, getContractTypeColor } from '@/lib/utils'
 import { getAuth, AuthUser } from '@/lib/auth'
@@ -10,7 +11,7 @@ import { ConfirmDialog } from '@/components/ConfirmDialog'
 import type { Employee, ContractType, Gender, Status, Department, Position } from '@/lib/types'
 
 const CONTRACT_TYPES: ContractType[] = ['Full-time', 'Part-time', 'Probation', 'Contract']
-const GENDERS: Gender[] = ['Nam', 'Nữ', 'Khác']
+const GENDERS: Gender[] = ['Nam', 'Nữ']
 
 function emptyEmp(departments: Department[], positions: Position[]): Employee {
   return {
@@ -66,6 +67,7 @@ export default function NhanVienPage() {
       if (authData?.role === 'EMPLOYEE' && authData.empId) {
         filteredEmployees = data.employees.filter(e => e.employee_id === authData.empId)
       }
+      filteredEmployees.sort((a, b) => a.employee_code.localeCompare(b.employee_code, undefined, { numeric: true, sensitivity: 'base' }))
       setEmployees(filteredEmployees)
       setDepartments(data.departments)
       setPositions(data.positions)
@@ -130,13 +132,15 @@ export default function NhanVienPage() {
       record.employee_id = genId(employees)
       record.employee_code = genCode(employees)
       record.created_at = new Date().toISOString().slice(0, 10)
-      next = [...employees, record]
+      record.status = 'Active'
+      next = [record, ...employees]
     }
 
     setSaving(true)
     try {
       await saveEmployees(next)
       setEmployees(next)
+      showToast(editTarget ? 'Cập nhật nhân viên thành công!' : 'Thêm mới nhân viên thành công!', 'success')
       if (editTarget && selected?.employee_id === editTarget.employee_id) setSelected(record)
       logActivity(
         editTarget ? 'UPDATE' : 'CREATE',
@@ -148,7 +152,7 @@ export default function NhanVienPage() {
       )
       setModalOpen(false)
     } catch (err: any) {
-      alert('Lỗi lưu: ' + err.message)
+      showToast('Lỗi lưu: ' + err.message, 'error')
     } finally {
       setSaving(false)
     }
@@ -160,10 +164,11 @@ export default function NhanVienPage() {
     try {
       await saveEmployees(next)
       setEmployees(next)
+      showToast('Xóa nhân viên thành công!', 'success')
       if (selected?.employee_id === emp.employee_id) setSelected(null)
       logActivity('DELETE', 'nhan-vien', emp.employee_id, `Xóa nhân viên ${emp.full_name} (${emp.employee_code})`)
     } catch (err: any) {
-      alert('Lỗi xóa: ' + err.message)
+      showToast('Lỗi xóa: ' + err.message, 'error')
     } finally {
       setSaving(false)
     }
@@ -476,19 +481,21 @@ export default function NhanVienPage() {
               onChange={e => setForm(p => ({ ...p, address: e.target.value }))}
               className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#bde619]/50" />
           </div>
-          <div className="col-span-2">
-            <label className="block text-xs font-semibold text-slate-700 mb-1.5">Trạng thái</label>
-            <div className="flex gap-3">
-              {(['Active', 'Inactive'] as Status[]).map(s => (
-                <button key={s} type="button" onClick={() => setForm(p => ({ ...p, status: s }))}
-                  className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all ${f.status === s
-                    ? s === 'Active' ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
-                    : 'border-slate-200 text-slate-500'}`}>
-                  {s === 'Active' ? '● Đang làm việc' : '○ Đã nghỉ'}
-                </button>
-              ))}
+          {editTarget && (
+            <div className="col-span-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Trạng thái</label>
+              <div className="flex gap-3">
+                {(['Active', 'Inactive'] as Status[]).map(s => (
+                  <button key={s} type="button" onClick={() => setForm(p => ({ ...p, status: s }))}
+                    className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all ${f.status === s
+                      ? s === 'Active' ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
+                      : 'border-slate-200 text-slate-500'}`}>
+                    {s === 'Active' ? '● Đang làm việc' : '○ Đã nghỉ'}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <div className="flex gap-3 mt-6 pt-5 border-t border-slate-100">
           <button onClick={() => setModalOpen(false)} className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">Hủy bỏ</button>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Sidebar } from '@/components/Sidebar'
+import { ToastContainer } from '@/components/Toast'
 
 export const metadata: Metadata = {
   title: 'HRM - Hệ thống Quản lý Nhân sự',
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </main>
         </div>
+        <ToastContainer />
       </body>
     </html>
   )

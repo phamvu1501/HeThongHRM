@@ -112,3 +112,11 @@ textarea:focus {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-toast-slide {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

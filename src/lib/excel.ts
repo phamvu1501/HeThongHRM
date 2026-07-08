@@ -34,11 +34,11 @@ export function exportAttendances(records: Attendance[]) {
   const rows = records.map(a => ({
     'Mã CC': a.attendance_id,
     'Ngày': a.work_date,
+    'Người chấm công': a.checked_by || 'Admin Quản trị',
     'Nhân viên': a.employee_name ?? a.employee_id,
     'Ca làm': a.shift_name ?? a.shift_id,
     'Giờ vào': a.check_in || '—',
     'Giờ ra': a.check_out || '—',
-    'Phút làm': a.work_minutes,
     'Phút tăng ca': a.overtime_minutes,
     'Trạng thái': a.status,
     'Ghi chú': a.note,
@@ -164,10 +164,12 @@ export function exportAllData(data: {
   XLSX.utils.book_append_sheet(wb, ws1, 'Nhân viên')
 
   const attRows = data.attendances.map(a => ({
-    'Ngày': a.work_date, 'Nhân viên': a.employee_name ?? a.employee_id,
+    'Ngày': a.work_date,
+    'Người chấm công': a.checked_by || 'Admin Quản trị',
+    'Nhân viên': a.employee_name ?? a.employee_id,
     'Ca làm': a.shift_name ?? a.shift_id,
     'Giờ vào': a.check_in, 'Giờ ra': a.check_out,
-    'Phút làm': a.work_minutes, 'Phút tăng ca': a.overtime_minutes,
+    'Phút tăng ca': a.overtime_minutes,
     'Trạng thái': a.status, 'Ghi chú': a.note,
   }))
   const ws2 = XLSX.utils.json_to_sheet(attRows); autoWidth(ws2)
@@ -197,4 +199,86 @@ export function exportAllData(data: {
   XLSX.utils.book_append_sheet(wb, ws5, 'Bảng lương')
 
   download(wb, `HRM_Pro_Export_${new Date().toISOString().slice(0, 10)}`)
+}
+
+export function exportMonthlySummary(month: string, employees: any[], records: any[]) {
+  const rows = employees.map(emp => {
+    const atts = records.filter(r => r.employee_id === emp.employee_id && r.work_date.startsWith(month))
+    let actualDays = 0
+    let overtimeHours = 0
+    let lateTimes = 0
+    let earlyTimes = 0
+    let absentTimes = 0
+    let leaveDays = 0
+
+    atts.forEach(a => {
+      if (['Đúng giờ', 'Đi trễ', 'Về sớm', 'Đi trễ & Về sớm', 'Tăng ca', 'Nghỉ phép'].includes(a.status)) {
+        actualDays++
+      }
+      if (a.status.includes('Đi trễ') || (a.late_minutes && a.late_minutes > 0)) lateTimes++
+      if (a.status.includes('Về sớm') || (a.early_leave_minutes && a.early_leave_minutes > 0)) earlyTimes++
+      if (a.status === 'Vắng mặt') absentTimes++
+      if (a.status === 'Nghỉ phép') leaveDays++
+      overtimeHours += (a.overtime_minutes || 0) / 60
+    })
+
+    let recommendation = 'Không'
+    const rewards: string[] = []
+    const penalties: string[] = []
+
+    if (actualDays >= 22) {
+      if (overtimeHours >= 10) {
+        rewards.push('Thưởng chuyên cần + tăng ca (+500k)')
+      } else if (lateTimes === 0 && earlyTimes === 0 && absentTimes === 0) {
+        rewards.push('Thưởng chuyên cần xuất sắc (+300k)')
+      }
+    }
+    if (lateTimes >= 3 || earlyTimes >= 3) {
+      penalties.push('Phạt đi muộn/về sớm (-150k)')
+    }
+    if (absentTimes >= 1) {
+      penalties.push(`Phạt vắng mặt không phép (-${absentTimes * 200}k)`)
+    }
+
+    if (rewards.length > 0 && penalties.length > 0) {
+      recommendation = `${rewards.join(', ')} & ${penalties.join(', ')}`
+    } else if (rewards.length > 0) {
+      recommendation = rewards.join(', ')
+    } else if (penalties.length > 0) {
+      recommendation = penalties.join(', ')
+    }
+
+    return {
+      'Mã NV': emp.employee_code,
+      'Họ và tên': emp.full_name,
+      'Công chuẩn': 22,
+      'Công thực tế': actualDays,
+      'Giờ tăng ca': overtimeHours.toFixed(1) + 'h',
+      'Đi muộn (lần)': lateTimes,
+      'Về sớm (lần)': earlyTimes,
+      'Vắng mặt (ngày)': absentTimes,
+      'Nghỉ phép (ngày)': leaveDays,
+      'Đề xuất Thưởng/Phạt': recommendation
+    }
+  })
+
+  const ws = XLSX.utils.json_to_sheet(rows)
+  const range = XLSX.utils.decode_range(ws['!ref'] || 'A1')
+  const cols: { wch: number }[] = []
+  for (let C = range.s.c; C <= range.e.c; C++) {
+    let max = 10
+    for (let R = range.s.r; R <= range.e.r; R++) {
+      const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })]
+      if (cell && cell.v != null) {
+        const len = String(cell.v).length
+        if (len > max) max = len
+      }
+    }
+    cols.push({ wch: Math.min(max + 2, 40) })
+  }
+  ws['!cols'] = cols
+
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, `Tổng kết ${month}`)
+  XLSX.writeFile(wb, `TongKetThang_${month}.xlsx`)
 }

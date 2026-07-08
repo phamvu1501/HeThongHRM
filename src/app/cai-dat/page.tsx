@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import { fetchData, saveSettings, logActivity } from '@/lib/store'
+import { showToast } from '@/components/Toast'
 import { exportAllData } from '@/lib/excel'
 import { formatDateTime } from '@/lib/utils'
 import { TopBar } from '@/components/TopBar'
@@ -84,10 +85,11 @@ export default function CaiDatPage() {
       setSettings(updatedSettings)
 
       logActivity('UPDATE', 'cai-dat', 'SYSTEM', 'Cập nhật cấu hình hệ thống.')
+      showToast('Cập nhật cấu hình hệ thống thành công!', 'success')
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
     } catch (e: any) {
-      alert('Lỗi lưu cấu hình: ' + e.message)
+      showToast('Lỗi lưu cấu hình: ' + e.message, 'error')
     } finally {
       setSaving(false)
     }
@@ -104,7 +106,8 @@ export default function CaiDatPage() {
         payrolls: data.payrolls,
       })
       logActivity('UPDATE', 'cai-dat', 'EXPORT', 'Trích xuất (Export) toàn bộ Database ra file Backup Excel.')
-    }).catch(err => alert('Lỗi tải dữ liệu: ' + err.message)).finally(() => setSaving(false))
+      showToast('Xuất dữ liệu dự phòng Excel thành công!', 'success')
+    }).catch(err => showToast('Lỗi tải dữ liệu: ' + err.message, 'error')).finally(() => setSaving(false))
   }
 
   const currentSettings = tab === 'general' ? filterSettings(generalKeys) : []

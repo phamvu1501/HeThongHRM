@@ -3,18 +3,17 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
   user_id       String    @id @default(uuid())
   username      String    @unique
   password_hash String
-  role          String    @default("EMPLOYEE") // ADMIN, HR, MANAGER, EMPLOYEE
+  role          String    @default("EMPLOYEE")
   status        String    @default("Active")
   created_at    String
-  
   employee_id   String?   @unique
   employee      Employee? @relation(fields: [employee_id], references: [employee_id])
 }
@@ -26,7 +25,6 @@ model Department {
   manager_emp_id  String
   status          String     @default("Active")
   created_at      String
-
   employees       Employee[]
 }
 
@@ -37,153 +35,139 @@ model Position {
   salary_band_min Float
   salary_band_max Float
   status          String     @default("Active")
-
   employees       Employee[]
 }
 
 model Employee {
-  employee_id     String     @id
-  employee_code   String     @unique
-  full_name       String
-  gender          String
-  dob             String
-  phone           String
-  email           String
-  address         String
-  join_date       String
-  contract_type   String
-  base_salary     Float
-  bank_account_no String
-  status          String     @default("Active")
-  created_at      String
-
-  department_id   String
-  department      Department @relation(fields: [department_id], references: [department_id])
-
-  position_id     String
-  position        Position   @relation(fields: [position_id], references: [position_id])
-
-  user             User?
+  employee_id      String            @id
+  employee_code    String            @unique
+  full_name        String
+  gender           String
+  dob              String
+  phone            String
+  email            String
+  address          String
+  join_date        String
+  contract_type    String
+  base_salary      Float
+  bank_account_no  String
+  status           String            @default("Active")
+  created_at       String
+  department_id    String
+  position_id      String
+  adjustments      Adjustment[]
+  attendances      Attendance[]
+  department       Department        @relation(fields: [department_id], references: [department_id])
+  position         Position          @relation(fields: [position_id], references: [position_id])
+  leaveRequests    LeaveRequest[]
+  payrolls         Payroll[]
   salaryHistories  SalaryHistory[]
   shiftAssignments ShiftAssignment[]
-  attendances      Attendance[]
-  leaveRequests    LeaveRequest[]
-  adjustments      Adjustment[]
-  payrolls         Payroll[]
+  user             User?
 }
 
 model SalaryHistory {
-  id              String   @id @default(uuid())
-  amount          Float
-  effective_from  String
-  effective_to    String?
-  created_at      String
-  
-  employee_id     String
-  employee        Employee @relation(fields: [employee_id], references: [employee_id])
+  id             String   @id @default(uuid())
+  amount         Float
+  effective_from String
+  effective_to   String?
+  created_at     String
+  employee_id    String
+  employee       Employee @relation(fields: [employee_id], references: [employee_id])
 }
 
 model ShiftAssignment {
-  id              String   @id @default(uuid())
-  effective_from  String
-  effective_to    String?
-  created_at      String
-  
-  employee_id     String
-  employee        Employee @relation(fields: [employee_id], references: [employee_id])
-  
-  shift_id        String
-  shift           Shift    @relation(fields: [shift_id], references: [shift_id])
+  id             String   @id @default(uuid())
+  effective_from String
+  effective_to   String?
+  created_at     String
+  employee_id    String
+  shift_id       String
+  employee       Employee @relation(fields: [employee_id], references: [employee_id])
+  shift          Shift    @relation(fields: [shift_id], references: [shift_id])
 }
 
 model Shift {
-  shift_id        String     @id
-  shift_name      String
-  start_time      String
-  end_time        String
-  break_min       Int
-  work_hours      Float
-  status          String     @default("Active")
-
+  shift_id         String            @id
+  shift_name       String
+  start_time       String
+  end_time         String
+  break_min        Int
+  work_hours       Float
+  status           String            @default("Active")
   attendances      Attendance[]
   shiftAssignments ShiftAssignment[]
 }
 
 model Attendance {
-  attendance_id         String     @id
-  work_date             String
-  check_in              String
-  check_out             String
-  work_minutes          Int?
-  overtime_minutes      Int?
-  late_minutes          Int?
-  early_leave_minutes   Int?
-  status                String
-  note                  String
-
-  employee_id           String
-  employee              Employee   @relation(fields: [employee_id], references: [employee_id])
-
-  shift_id              String
-  shift                 Shift      @relation(fields: [shift_id], references: [shift_id])
-  
-  alerts                AttendanceAlert[]
+  attendance_id       String            @id
+  work_date           String
+  check_in            String
+  check_out           String
+  work_minutes        Int?
+  overtime_minutes    Int?
+  late_minutes        Int?
+  early_leave_minutes Int?
+  status              String
+  note                String
+  checked_by          String?           @default("Admin Quản trị")
+  employee_id         String
+  shift_id            String
+  employee            Employee          @relation(fields: [employee_id], references: [employee_id])
+  shift               Shift             @relation(fields: [shift_id], references: [shift_id])
+  alerts              AttendanceAlert[]
 }
 
 model AttendanceAlert {
-  alert_id        String     @id @default(uuid())
-  severity        String     // LOW, MEDIUM, HIGH
-  status          String     @default("PENDING") // PENDING, RESOLVED
-  created_at      String
-  resolved_by     String?
-  resolved_at     String?
-
-  attendance_id   String
-  attendance      Attendance @relation(fields: [attendance_id], references: [attendance_id])
+  alert_id      String     @id @default(uuid())
+  severity      String
+  status        String     @default("PENDING")
+  created_at    String
+  resolved_by   String?
+  resolved_at   String?
+  attendance_id String
+  attendance    Attendance @relation(fields: [attendance_id], references: [attendance_id])
 }
 
 model LeaveRequest {
-  leave_id        String     @id
-  leave_type      String
-  from_date       String
-  to_date         String
-  days            Float
-  reason          String
-  status          String
-  approved_by     String
-  created_at      String
-
-  employee_id     String
-  employee        Employee   @relation(fields: [employee_id], references: [employee_id])
+  leave_id    String   @id
+  leave_type  String
+  from_date   String
+  to_date     String
+  days        Float
+  reason      String
+  status      String
+  approved_by String
+  created_at  String
+  employee_id String
+  employee    Employee @relation(fields: [employee_id], references: [employee_id])
 }
 
 model Adjustment {
-  adj_id          String     @id
-  month           String
-  adj_type        String
-  amount          Float
-  description     String
-  created_at      String
-
-  employee_id     String
-  employee        Employee   @relation(fields: [employee_id], references: [employee_id])
+  adj_id      String   @id
+  month       String
+  adj_type    String
+  amount      Float
+  description String
+  created_at  String
+  employee_id String
+  employee    Employee @relation(fields: [employee_id], references: [employee_id])
 }
 
 model PayrollPeriod {
-  period_id       String     @id
-  month           String
-  year            String
-  state           String     @default("OPEN") // OPEN, CALCULATED, REVIEW, LOCKED, PAID
-  locked_by       String?
-  locked_at       String?
-  created_at      String
-  
-  payrolls        Payroll[]
+  period_id  String    @id
+  month      String
+  year       String
+  state      String    @default("OPEN")
+  locked_by  String?
+  locked_at  String?
+  created_at String
+  payrolls   Payroll[]
 }
 
 model Payroll {
-  payroll_id         String     @id
-  version            Int        @default(1)
+  payroll_id         String        @id
+  version            Int           @default(1)
   base_salary        Float
   work_days_standard Float
   work_days_actual   Float
@@ -197,11 +181,9 @@ model Payroll {
   net_pay            Float
   pay_date           String
   status             String
-
   employee_id        String
-  employee           Employee   @relation(fields: [employee_id], references: [employee_id])
-  
   period_id          String
+  employee           Employee      @relation(fields: [employee_id], references: [employee_id])
   period             PayrollPeriod @relation(fields: [period_id], references: [period_id])
 }
 
